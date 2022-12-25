@@ -1,0 +1,372 @@
+unit unt_DataM_forosh;
+
+interface
+
+uses
+  SysUtils, Classes, DB, ADODB;
+
+type
+  TDataM_forosh = class(TDataModule)
+    ADOQ_forosh: TADOQuery;
+    ADOQuery_jam_forosh: TADOQuery;
+    ADO_temp: TADOQuery;
+    ADOQ_sal: TADOQuery;
+    ADOQ_salsal: TWideStringField;
+    ADOQ_jam_temp: TADOQuery;
+    ADOQ_print_kh: TADOQuery;
+    ADOQ_vazn_goni: TADOQuery;
+    ADOQ_vazn_gonigoni_kol: TFloatField;
+    ADOQ_vazn_gonivazn_kol: TFloatField;
+    ADOQ_print_kh2: TADOQuery;
+    ADOQ_print_kh2keraye_kh: TFloatField;
+    ADOQ_print_kh2ojrat_kh: TFloatField;
+    ADOQ_jame_ranande: TADOQuery;
+    ADOQ_jame_ranandevazn_kol: TFloatField;
+    ADOQ_jame_ranandekol_keraye: TFloatField;
+    ADOQ_jame_ranandegoni_kol: TFloatField;
+    ADOQ_hame: TADOQuery;
+    ADOQ_hamesh_kh: TFloatField;
+    ADOQ_hametarikh: TWideStringField;
+    ADOQ_hamename_kh: TWideStringField;
+    ADOQ_hamefamily_kh: TWideStringField;
+    ADO_tempname: TWideStringField;
+    ADO_tempfamily: TWideStringField;
+    ADO_tempanjir_noe: TWideStringField;
+    ADO_tempvazn: TFloatField;
+    ADO_tempfi: TFloatField;
+    ADO_tempojrat: TIntegerField;
+    ADO_tempkeraye: TIntegerField;
+    ADO_tempgeymat_kol: TFloatField;
+    ADO_tempojrat_kol: TFloatField;
+    ADO_tempkeraye_kol: TFloatField;
+    ADO_tempremain: TFloatField;
+    ADO_temptarikh: TWideStringField;
+    ADO_tempcod: TAutoIncField;
+    ADO_tempcod_shakhs: TIntegerField;
+    ADO_tempgoni: TIntegerField;
+    ADO_tempsh_kh: TFloatField;
+    ADO_tempdaryaft_nagd: TFloatField;
+    ADO_tempbedehi: TFloatField;
+    ADO_tempname_kh: TWideStringField;
+    ADO_tempfamily_kh: TWideStringField;
+    ADO_tempsal: TWideStringField;
+    ADO_tempmande: TFloatField;
+    ADO_tempojrat_az_kh: TFloatField;
+    ADO_tempkeraye_az_kh: TFloatField;
+    ADO_tempcod_kh: TIntegerField;
+    ADO_tempojrat_az_kh_kol: TFloatField;
+    ADO_tempkeraye_az_kh_kol: TFloatField;
+    ADO_tempmount_kh: TFloatField;
+    ADO_tempojrat_hasanpor: TFloatField;
+    ADO_tempranande: TWideStringField;
+    ADOQ_update_forosh: TADOQuery;
+    ADOQ_update_foroshname: TWideStringField;
+    ADOQ_update_foroshfamily: TWideStringField;
+    ADOQ_update_foroshanjir_noe: TWideStringField;
+    ADOQ_update_foroshvazn: TFloatField;
+    ADOQ_update_foroshfi: TFloatField;
+    ADOQ_update_foroshojrat: TIntegerField;
+    ADOQ_update_foroshkeraye: TIntegerField;
+    ADOQ_update_foroshgeymat_kol: TFloatField;
+    ADOQ_update_foroshojrat_kol: TFloatField;
+    ADOQ_update_foroshkeraye_kol: TFloatField;
+    ADOQ_update_foroshremain: TFloatField;
+    ADOQ_update_foroshtarikh: TWideStringField;
+    ADOQ_update_foroshcod: TAutoIncField;
+    ADOQ_update_foroshcod_shakhs: TIntegerField;
+    ADOQ_update_foroshgoni: TIntegerField;
+    ADOQ_update_foroshsh_kh: TFloatField;
+    ADOQ_update_foroshdaryaft_nagd: TFloatField;
+    ADOQ_update_foroshbedehi: TFloatField;
+    ADOQ_update_foroshname_kh: TWideStringField;
+    ADOQ_update_foroshfamily_kh: TWideStringField;
+    ADOQ_update_foroshsal: TWideStringField;
+    ADOQ_update_foroshmande: TFloatField;
+    ADOQ_update_foroshojrat_az_kh: TFloatField;
+    ADOQ_update_foroshkeraye_az_kh: TFloatField;
+    ADOQ_update_foroshcod_kh: TIntegerField;
+    ADOQ_update_foroshojrat_az_kh_kol: TFloatField;
+    ADOQ_update_foroshkeraye_az_kh_kol: TFloatField;
+    ADOQ_update_foroshmount_kh: TFloatField;
+    ADOQ_update_foroshojrat_hasanpor: TFloatField;
+    ADOQ_update_foroshranande: TWideStringField;
+    ADOQ_jame_bank: TADOQuery;
+    ADOQuery_jam_foroshmande_kol: TFloatField;
+    ADOQuery_jam_foroshnagd_kol: TFloatField;
+    ADOQuery_jam_foroshg_kol: TFloatField;
+    ADOQuery_jam_foroshojrat_kol: TFloatField;
+    ADOQuery_jam_foroshkeraye_kol: TFloatField;
+    ADOQuery_jam_foroshremain_kol: TFloatField;
+    ADOQuery_jam_foroshgoni_kol: TFloatField;
+    ADOQuery_jam_foroshvazn_kol: TFloatField;
+    ADOQuery_jam_foroshnakhales_kol: TFloatField;
+    ADOQ_print_khkh_mount: TFloatField;
+    ADOQ_print_khmiangin: TFloatField;
+    ADOQ_jame_ra_daron: TADOQuery;
+    ADOQ_jame_ra_daronvazn_kol: TFloatField;
+    ADOQ_jame_ra_daronkol_keraye: TFloatField;
+    ADOQ_jame_ra_darongoni_kol: TFloatField;
+    ADOConnection1: TADOConnection;
+    ADOQuery_ran_daron: TADOQuery;
+    ADOQuery_ran_biron: TADOQuery;
+    ADOQuery_ran_darontarikh: TWideStringField;
+    ADOQuery_ran_daronvazn_kol: TFloatField;
+    ADOQuery_ran_daronkol_keraye: TFloatField;
+    ADOQuery_ran_darongoni_kol: TFloatField;
+    ADOQuery_ran_birontarikh: TWideStringField;
+    ADOQuery_ran_bironvazn_kol: TFloatField;
+    ADOQuery_ran_bironkol_keraye: TFloatField;
+    ADOQuery_ran_birongoni_kol: TFloatField;
+    ADOQ_jam_tempg_kol: TFloatField;
+    ADOQ_jam_tempojrat_kol: TFloatField;
+    ADOQ_jam_tempkeraye_kol: TFloatField;
+    ADOQ_jam_tempremain_kol: TFloatField;
+    ADOQ_jam_tempgoni_kol: TFloatField;
+    ADOQ_jam_tempvazn_kol: TFloatField;
+    ADOQ_jam_tempnakhales_kol: TFloatField;
+    ADOQ_foroshname: TWideStringField;
+    ADOQ_foroshfamily: TWideStringField;
+    ADOQ_foroshanjir_noe: TWideStringField;
+    ADOQ_foroshvazn: TFloatField;
+    ADOQ_foroshfi: TFloatField;
+    ADOQ_foroshojrat: TIntegerField;
+    ADOQ_foroshkeraye: TIntegerField;
+    ADOQ_foroshgeymat_kol: TFloatField;
+    ADOQ_foroshojrat_kol: TFloatField;
+    ADOQ_foroshkeraye_kol: TFloatField;
+    ADOQ_foroshremain: TFloatField;
+    ADOQ_foroshtarikh: TWideStringField;
+    ADOQ_foroshcod: TAutoIncField;
+    ADOQ_foroshcod_shakhs: TIntegerField;
+    ADOQ_foroshgoni: TIntegerField;
+    ADOQ_foroshsh_kh: TFloatField;
+    ADOQ_foroshdaryaft_nagd: TFloatField;
+    ADOQ_foroshbedehi: TFloatField;
+    ADOQ_foroshname_kh: TWideStringField;
+    ADOQ_foroshfamily_kh: TWideStringField;
+    ADOQ_foroshsal: TWideStringField;
+    ADOQ_foroshmande: TFloatField;
+    ADOQ_foroshojrat_az_kh: TFloatField;
+    ADOQ_foroshkeraye_az_kh: TFloatField;
+    ADOQ_foroshcod_kh: TIntegerField;
+    ADOQ_foroshojrat_az_kh_kol: TFloatField;
+    ADOQ_foroshkeraye_az_kh_kol: TFloatField;
+    ADOQ_foroshmount_kh: TFloatField;
+    ADOQ_foroshojrat_hasanpor: TFloatField;
+    ADOQ_foroshranande: TWideStringField;
+    ADOQ_foroshranande_daron: TWideStringField;
+    ADOQ_find_eslahshavandeha: TADOQuery;
+    ADOQ_find_eslahshavandehacod: TAutoIncField;
+    ADOQ_find_eslahshavandehavazn: TFloatField;
+    ADOQ_find_eslahshavandehageymat_kol: TFloatField;
+    ADOQ_find_eslahshavandehaojrat_az_kh: TFloatField;
+    ADOQ_find_eslahshavandehaojrat_kol: TFloatField;
+    ADOQ_find_eslahshavandehakeraye_az_kh: TFloatField;
+    ADOQ_find_eslahshavandehakeraye_az_kh_kol: TFloatField;
+    ADOQ_find_eslahshavandeharanande_daron: TWideStringField;
+    ADOQ_find_eslahshavandehakeraye: TIntegerField;
+    ADOQ_find_eslahshavandehakeraye_kol: TFloatField;
+    ADOQ_find_eslahshavandeharanande: TWideStringField;
+    ADOQ_jam_forosh2: TADOQuery;
+    ADOQ_jam_forosh2o_az_kh_kol: TFloatField;
+    ADOQ_jam_forosh2kre_bein_kol: TFloatField;
+    ADOQ_jam_forosh2kre_daron_kol: TFloatField;
+    ADOQ_jam_forosh2ojrat_kol: TFloatField;
+    ADOQ_jam_forosh2jam_kol: TFloatField;
+    ADOQ_vazn_bedon_ojrat: TADOQuery;
+    FloatField2: TFloatField;
+    ADOQ_vazn_bedon_keraye: TADOQuery;
+    FloatField4: TFloatField;
+    ADOQ_oj_for_factor_kh: TADOQuery;
+    ADOQ_oj_for_factor_khojrat_az_kh: TFloatField;
+    ADOQ_ker_for_factor_kh: TADOQuery;
+    FloatField3: TFloatField;
+    ADOQ_mande_bank: TADOQuery;
+    ADOQ_mande_bankmande_kol: TFloatField;
+    ADOQ_jame_bankbedehkar_kol: TFloatField;
+    ADOQ_jame_bankbestankar_kol: TFloatField;
+    ADOQ_bank2: TADOQuery;
+    ADOQ_bank2moshakhasat_kol: TWideStringField;
+    ADOQ_bank2tarikh: TWideStringField;
+    ADOQ_bank2sh_fish: TFloatField;
+    ADOQ_bank2sharh: TWideStringField;
+    ADOQ_bank2bedehkar: TFloatField;
+    ADOQ_bank2bestankar: TFloatField;
+    ADOQ_bank2mande: TFloatField;
+    ADOQ_bank2cod: TAutoIncField;
+    procedure show_kol_all;
+    procedure show_forosh_all;
+    procedure insert_forosh(ranande_daron,sal,name_kh,family_kh,noe,vazn,fi,ojrat,keraye,name,family,tarikh,cod_shakhs,goni,cod_kh,ranande:string);
+    procedure show_sal;
+    procedure ADOQ_hameAfterScroll(DataSet: TDataSet);
+    procedure ADOQ_foroshAfterScroll(DataSet: TDataSet);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DataM_forosh: TDataM_forosh;
+
+implementation
+
+uses unt_DataMo_shakhs, unt_print_resid_forosh, unt_sel_kharid,
+  unt_add_kharidha, unt_pardakht_be_foroshande, unt_eslah_forosh,
+  unt_eslah_asli, unt_frm_eslah_bank, Forms,
+  unt_print_pardakht_be_foroshande_jam, unt_DataM_final,
+  unt_nahve_pardakht_kharidar;
+
+{$R *.dfm}
+procedure TDataM_forosh.show_sal;
+begin
+  ADOQ_sal.SQL.Text:='select distinct sal from T_sal_fi';
+  ADOQ_sal.Open;
+end;
+procedure tDataM_forosh.show_kol_all;
+begin
+ ADOQuery_jam_forosh.SQL.Text:=' select sum(geymat_kol) as g_kol,sum(ojrat_kol) as ojrat_kol'+
+  ', sum(keraye_kol) as keraye_kol , sum(remain) as  remain_kol,sum(goni) as goni_kol,sum(vazn) as vazn_kol'+
+  ' from t_forosh';
+ ADOQuery_jam_forosh.Open;
+end;
+procedure tDataM_forosh.show_forosh_all;
+begin
+  adoq_forosh.SQL.Text:='select * from T_forosh order by family,name,tarikh';
+  adoq_forosh.Open;
+end;
+procedure tDataM_forosh.insert_forosh(ranande_daron,sal,name_kh,family_kh,noe,vazn,fi,ojrat,keraye,name,family,tarikh,cod_shakhs,goni,cod_kh,ranande:string);
+var g_kol,ojrat_kol,keraye_kol,remain,bedehi:real;
+    ojrat_az_kh_kol,keraye_az_kh_kol,ojrat_az_kh,keraye_az_kh,mount_kh,ojrat_hasanpor,mah:string;
+begin
+  g_kol:=StrToFloat(vazn)*StrToFloat(fi);
+  ojrat_kol:=StrToFloat(vazn)*StrToFloat(ojrat);
+  keraye_kol:=StrToFloat(vazn)*StrToFloat(keraye);
+  remain:=g_kol-(ojrat_kol+keraye_kol);
+  bedehi:=remain;
+  if frm_add_kharidha.E_keraye.Text='' then
+    frm_add_kharidha.E_keraye.Text:='0';
+    
+  ojrat_az_kh:=frm_add_kharidha.E_ojrat.Text;
+  keraye_az_kh:=frm_add_kharidha.E_keraye.Text;
+
+  keraye_az_kh_kol:=FloatToStr(StrToFloat(vazn)*StrToFloat(keraye_az_kh));
+  ojrat_az_kh_kol:=FloatToStr(StrToFloat(vazn)*StrToFloat(ojrat_az_kh));
+
+  ojrat_hasanpor:=FloatToStr(StrToFloat(ojrat_az_kh_kol)+ojrat_kol);
+
+  mount_kh:=FloatToStr(g_kol+StrToFloat(keraye_az_kh_kol)+StrToFloat(ojrat_az_kh_kol));
+
+  mah:=tarikh[6]+tarikh[7];
+
+  ADO_temp.SQL.Text:='insert into T_temp(mah,ranande_daron,ranande,mande,ojrat_hasanpor,mount_kh,ojrat_az_kh_kol,keraye_az_kh_kol,ojrat_az_kh,keraye_az_kh,'+
+                                                  'cod_kh,sal,name_kh,'+
+                                                  'family_kh,bedehi,'+
+                                                  'name,family,'+
+                                                  'anjir_noe,vazn,'+
+                                                  'fi,ojrat,'+
+                                                  'keraye,geymat_kol,'+
+                                                  'ojrat_kol,'+
+                                                  'keraye_kol,remain,'+
+                                                  'tarikh,cod_shakhs,goni)'+
+                                                  'values('+QuotedStr(mah)+
+                                                  ','+QuotedStr(ranande_daron)+
+                                                  ','+QuotedStr(ranande)+
+                                                  ','+FloatToStr(remain)+
+                                                  ','+ojrat_hasanpor+
+                                                  ','+mount_kh+
+                                                  ','+ojrat_az_kh_kol+
+                                                  ','+keraye_az_kh_kol+
+                                                  ','+ojrat_az_kh+
+                                                  ','+keraye_az_kh+
+                                                  ','+cod_kh+
+                                                  ','+QuotedStr(sal)+
+                                                  ','+QuotedStr(name_kh)+
+                                                  ','+QuotedStr(family_kh)+
+                                                  ','+FloatToStr(bedehi)+
+                                                  ','+QuotedStr(name)+
+                                                  ','+QuotedStr(family)+
+                                                  ','+QuotedStr(noe)+
+                                                  ','+vazn+
+                                                  ','+fi+
+                                                  ','+ojrat+
+                                                  ','+keraye+
+                                                  ','+FloatToStr(g_kol)+
+                                                  ','+FloatToStr(ojrat_kol)+
+                                                  ','+FloatToStr(keraye_kol)+
+                                                  ','+FloatToStr(remain)+
+                                                  ','+QuotedStr(tarikh)+
+                                                  ','+cod_shakhs+
+                                                  ','+goni+')';
+ ADO_temp.ExecSQL;
+ //Frm_print_resid_kharid.QuickRep1.Print;
+// frm_print_resid_forosh.QuickRep1.Preview;  
+end;
+
+procedure TDataM_forosh.ADOQ_hameAfterScroll(DataSet: TDataSet);
+begin
+
+  if (frm_eslah_forosh<>nil)and(frm_eslah_forosh.Showing) then
+  begin
+    DataM_final.ADOQ_timr_of_forosh.SQL.Text:='select * from t_time_of_forosh where cod_sh='+
+    QuotedStr(DataMo_shakhs.ADOQ_kharidarcod.AsString)+' and sh_kh='+QuotedStr(DataM_forosh.ADOQ_hamesh_kh.AsString);
+    DataM_final.ADOQ_timr_of_forosh.Open;
+
+    frm_eslah_forosh.L_time.Caption:=DataM_final.ADOQ_timr_of_foroshtime.AsString;
+    frm_nahve_pardakht_kharidar.L_nakhales_kol.Caption:=frm_eslah_forosh.DBText5.Caption;
+
+  end;
+  if (frm_pardakht_be_foroshande<> nil)and(frm_pardakht_be_foroshande.Showing) then
+  begin
+    frm_pardakht_be_foroshande.jozeiat_hame;
+
+  end;
+  if (frm_eslah_forosh<>nil)and(frm_eslah_forosh.Showing) then
+  begin
+    frm_eslah_forosh.jozeiat_kharidha;
+    frm_eslah_forosh.CheckBox1.Checked:=false;
+  end;
+  if (frm_eslah_asli<>nil)and(frm_eslah_asli.Showing) then
+  begin
+    frm_eslah_asli.jozeiat_kharidha;
+    frm_eslah_asli.CheckBox1.Checked:=False;
+    frm_eslah_asli.Label23.Visible:=false;
+    frm_eslah_asli.ComboBox1.Visible:=false;
+  end;
+end;
+
+procedure TDataM_forosh.ADOQ_foroshAfterScroll(DataSet: TDataSet);
+var s:string;
+begin
+  if (frm_eslah_asli<>nil)and(frm_eslah_asli.Showing) then
+  begin
+  if ADOQ_forosh.RecordCount>0 then
+  begin
+    s:=frm_eslah_asli.DBText4.Caption;
+    frm_eslah_asli.L_cod.Caption:=frm_eslah_asli.DBT_cod.Caption;
+    frm_eslah_asli.L_sh_kh.Caption:=frm_eslah_asli.DBT_sh_kh.Caption;
+    frm_eslah_asli.E_vazn.Text:=frm_eslah_asli.DBText6.Caption;
+    frm_eslah_asli.E_t_goni.Text:=frm_eslah_asli.DBText9.Caption;
+    frm_eslah_asli.E_fi.Text:=frm_eslah_asli.DBText10.Caption;
+    frm_eslah_asli.E_ojrat.Text:=frm_eslah_asli.DBText11.Caption;
+    frm_eslah_asli.L_cod.Caption:=frm_eslah_asli.DBT_cod.Caption;
+    frm_eslah_asli.e_ojrat_AZ_KHARIDAR.Text:=ADOQ_foroshojrat_az_kh.AsString;
+    frm_eslah_asli.E_roz.Text:=s[9]+s[10];
+    frm_eslah_asli.E_mah.Text:=s[6]+s[7];
+    frm_eslah_asli.E_sal.Text:=s[1]+s[2]+s[3]+s[4];
+    frm_eslah_asli.L_g_kol.Caption:='';
+    frm_eslah_asli.L_ojrat_kol.Caption:='';
+    frm_eslah_asli.L_keraye_kol.Caption:='';
+    frm_eslah_asli.L_remain.Caption:='';
+
+    frm_eslah_asli.CheckBox1.Checked:=False;
+    frm_eslah_asli.Label23.Visible:=false;
+    frm_eslah_asli.ComboBox1.Visible:=false;
+  end;
+end;
+
+end;
+
+
+
+end.

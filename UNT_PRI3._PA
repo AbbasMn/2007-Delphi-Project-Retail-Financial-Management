@@ -1,0 +1,24 @@
+unit Unt_print_r_forosh;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs;
+
+type
+  Tfrm_print_esid_forosh = class(TForm)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frm_print_esid_forosh: Tfrm_print_esid_forosh;
+
+implementation
+
+{$R *.dfm}
+
+end.

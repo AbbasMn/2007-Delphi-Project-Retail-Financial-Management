@@ -1,0 +1,220 @@
+unit unt_kharid;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls, SUIForm, DB, Grids, DBGrids, Mask;
+
+type
+  TFrm_kharid = class(TForm)
+    suiForm1: TsuiForm;
+    Button1: TButton;
+    Button2: TButton;
+    GroupBox1: TGroupBox;
+    Label4: TLabel;
+    E_search: TEdit;
+    DBGrid1: TDBGrid;
+    DataSource1: TDataSource;
+    GroupBox2: TGroupBox;
+    Label5: TLabel;
+    E_vazn: TEdit;
+    Label6: TLabel;
+    E_fi: TEdit;
+    Label7: TLabel;
+    E_ojrat: TEdit;
+    Label1: TLabel;
+    E_keraye: TEdit;
+    GroupBox3: TGroupBox;
+    GroupBox5: TGroupBox;
+    RadioGroup11: TRadioGroup;
+    E_tarikh: TEdit;
+    Label2: TLabel;
+    ComboBox1: TComboBox;
+    Label3: TLabel;
+    E_t_goni: TEdit;
+    procedure FormShow(Sender: TObject);
+    procedure E_searchChange(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure RadioGroup11Click(Sender: TObject);
+    function check:boolean;
+    procedure check_ashar(s:string;var t:string);
+    procedure E_fiKeyPress(Sender: TObject; var Key: Char);
+    procedure E_ojratKeyPress(Sender: TObject; var Key: Char);
+    procedure E_kerayeKeyPress(Sender: TObject; var Key: Char);
+    procedure E_vaznKeyPress(Sender: TObject; var Key: Char);
+    PROCEDURE clear;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_kharid: TFrm_kharid;
+
+implementation
+
+uses unt_DataMo_shakhs, unt_DataMod_kharid, Taghvim, unt_main;
+
+{$R *.dfm}
+procedure TFrm_kharid.clear;
+begin
+  E_search.Text:='';
+  E_vazn.Text:='';
+  E_fi.Text:='';
+  E_ojrat.Text:='';
+  E_keraye.Text:='';
+  E_t_goni.Text:='';
+end;
+procedure TFrm_kharid.check_ashar(s:string;var t:string);
+var i,count:integer;
+begin
+  count:=0;
+  for i:=1 to StrLen(pchar(s)) do
+  begin
+   if s[i]='.' then
+    count:=count+1;
+  end;
+  if count>1 then
+    t:='no'
+  else
+    t:='yes';
+end;
+function TFrm_kharid.check:boolean;
+var s:string;
+    f:boolean;
+    x:real;
+begin
+  s:='';
+  f:=false;
+  if (E_vazn.Text='')then
+  begin
+   f:=true;
+   s:=s+' Ê“‰ ';
+  end;
+  if(E_fi.Text='')then
+   begin
+   f:=true;
+   s:=s+' ›Ì ';
+  end;
+
+  if(E_ojrat.Text='')then
+   begin
+   f:=true;
+   s:=s+' «Ã—  ';
+  end;
+
+  if(E_tarikh.Text='')then
+   begin
+   f:=true;
+   s:=s+'  «—ÌŒ ';
+  end;
+
+  s:=s+' »«Ìœ Ê«—œ ‘Êœ.';
+  if f then
+  begin
+    MessageBox(Handle,pchar(s),'Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+    check:=false;
+  end
+  else
+  begin
+    check:=true;
+    if E_keraye.Text='' then
+      E_keraye.Text:='0';
+    x:=(StrToFloat(E_fi.Text)*StrToFloat(E_vazn.Text))-(StrToFloat(E_ojrat.Text)*StrToFloat(E_vazn.Text)+StrToFloat(E_keraye.Text)*StrToFloat(E_vazn.Text));
+    if x <0 then
+    begin
+     MessageBox(Handle,pchar('œ— „Õ«”»Â »«ﬁÌ „«‰œÂ „‰›Ì ‘œÂ «”  << »«ﬁÌ „«‰œÂ ='+'  '+FloatToStr(x)+' >>.'),'Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+      check:=false;
+    end
+    else
+      check:=true;
+  end;
+end;
+
+procedure TFrm_kharid.FormShow(Sender: TObject);
+begin
+  DataMo_shakhs.show_foroshande;
+  E_tarikh.Text:=frm_main.E_tarikh.Text;
+  RadioGroup11.ItemIndex:=0;
+end;
+
+procedure TFrm_kharid.E_searchChange(Sender: TObject);
+begin
+  DataMo_shakhs.ADOQ__foroshande.Locate('family',E_search.Text,[loPartialKey]);
+end;
+
+
+
+procedure TFrm_kharid.Button2Click(Sender: TObject);
+begin
+  close;
+end;
+
+procedure TFrm_kharid.Button1Click(Sender: TObject);
+var t:string;
+begin
+ if check then
+ begin
+   if E_keraye.Text='' then
+    E_keraye.Text:='0';
+  if E_t_goni.Text='' then
+    E_t_goni.Text:='0';
+  check_ashar(E_vazn.Text,t);
+   if t='yes' then
+   begin
+     if MessageBox(Handle,pchar('Œ—Ìœ «‰ÃÌ— «“ ‰Ê⁄  '+ComboBox1.Text+' »Â „ﬁœ«— << '+E_vazn.Text+' >> òÌ·Ê ê—„ «“ ﬁ—«— [ '+' ⁄œ«œ êÊ‰Ì = '+E_t_goni.Text+' ° '+'ﬁÌ„  (òÌ·Ê)= '+E_fi.Text+' ° '+'«Ã—  (—Ì«·)= '+E_ojrat.Text+' ° '+'ò—«ÌÂ(—Ì«·)= '+E_keraye.Text+' '+'] «“ ¬ﬁ«/Œ«‰„ << '+DataMo_shakhs.ADOQ__foroshande.Fields[0].AsString+' '+DataMo_shakhs.ADOQ__foroshande.Fields[1].AsString+' >> —«  «ÌÌœ „Ì‰„«ÌÌœø '),' ÊÃÂ !' ,MB_YESNO or MB_ICONQUESTION or MB_RIGHT or MB_RTLREADING)=id_yes then
+     begin
+        DataMod_kharid.insert_kharid(ComboBox1.Text,E_vazn.Text,E_fi.Text,E_ojrat.Text,E_keraye.Text,DataMo_shakhs.ADOQ__foroshande.Fields[0].AsString,DataMo_shakhs.ADOQ__foroshande.Fields[1].AsString,E_tarikh.Text,DataMo_shakhs.ADOQ__foroshande.Fields[3].AsString,E_t_goni.Text);
+        MessageBox(Handle,'⁄„·Ì«  À»  Œ—Ìœ «‰Ã«„ ‘œ.',' ÊÃÂ !',MB_OK or MB_ICONINFORMATION or MB_RIGHT or MB_RTLREADING);
+        clear;
+     end
+     else
+        MessageBox(Handle,'⁄„·Ì«  À»  Œ—Ìœ «‰Ã«„ ‰‘œ.',' ÊÃÂ !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+   end
+   else
+   begin
+     E_vazn.Text:='';
+     MessageBox(Handle,' ⁄œ«œ ⁄·«∆„ ‰ﬁÿÂ «⁄‘«— œ—”  ‰„Ì »«‘œ.','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+   end;
+ end;
+end;
+
+procedure TFrm_kharid.RadioGroup11Click(Sender: TObject);
+begin
+  if RadioGroup11.ItemIndex=1 then
+  Begin
+    _taghvim.ShowModal;
+    E_tarikh.Text:=_taghvim._str_date;
+  end
+  else
+    E_tarikh.Text:=frm_main.E_tarikh.Text;
+end;
+
+procedure TFrm_kharid.E_fiKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure TFrm_kharid.E_ojratKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure TFrm_kharid.E_kerayeKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure TFrm_kharid.E_vaznKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9','.',#8]) then
+   key:=#0;
+end;
+
+end.

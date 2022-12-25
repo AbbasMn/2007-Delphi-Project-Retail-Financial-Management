@@ -1,0 +1,85 @@
+unit unt_bank_hasanpor;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls, SUIForm;
+
+type
+  Tfrm_bank_hasanpor = class(TForm)
+    suiForm1: TsuiForm;
+    Label1: TLabel;
+    l_type: TLabel;
+    L_edit: TLabel;
+    e_sal: TEdit;
+    Button1: TButton;
+    Button2: TButton;
+    procedure Button2Click(Sender: TObject);
+    function check:boolean;
+    function check_exist:boolean;
+    procedure insert_bank;
+    procedure Button1Click(Sender: TObject);
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frm_bank_hasanpor: Tfrm_bank_hasanpor;
+
+implementation
+
+uses unt_DataM_final;
+{$R *.dfm}
+procedure Tfrm_bank_hasanpor.insert_bank;
+begin
+  DataM_final.ADOQ_add_bank_hasan.SQL.Text:='insert into T_bank_hasanpor(bank_name)values('+QuotedStr(e_sal.Text)+')';
+  DataM_final.ADOQ_add_bank_hasan.ExecSQL;
+end;
+
+function Tfrm_bank_hasanpor.check_exist:boolean;
+begin
+  DataM_final.ADOQ_bank_hasan.SQL.Text:='select * from T_bank_hasanpor where bank_name='+QuotedStr(e_sal.Text);
+  DataM_final.ADOQ_bank_hasan.Open;
+
+  if DataM_final.ADOQ_bank_hasan.RecordCount>0 then
+  begin
+    check_exist:=true;
+    MessageBox(Handle,'‰«„ »«‰ò ﬁ»·¬ Ê«—œ ‘œÂ «” ','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+  end
+  else
+    check_exist:=false;
+
+end;
+
+function Tfrm_bank_hasanpor.check:boolean;
+begin
+  if (e_sal.Text='') then
+  begin
+     check:=false;
+     MessageBox(Handle,'‰«„ »«‰ò ÃœÌœ »«Ìœ Ê«—œ ‘Êœ.','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+  end
+   else
+      check:=true;
+end;
+
+procedure Tfrm_bank_hasanpor.Button2Click(Sender: TObject);
+begin
+  close;
+end;
+
+procedure Tfrm_bank_hasanpor.Button1Click(Sender: TObject);
+begin
+  if check then
+    if not check_exist then
+    begin
+      insert_bank;
+      DataM_final.show_bank_hasan;
+      e_sal.Text:='';
+    end;
+end;
+
+end.

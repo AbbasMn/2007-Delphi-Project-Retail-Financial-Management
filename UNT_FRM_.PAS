@@ -1,0 +1,1037 @@
+unit unt_frm_eslah_bank;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls, SUIForm, Grids, DBGrids, DB, DBCtrls, ADODB;
+
+type
+  Tfrm_eslah_bank = class(TForm)
+    suiForm1: TsuiForm;
+    GroupBox1: TGroupBox;
+    Memo1: TMemo;
+    Label7: TLabel;
+    Label6: TLabel;
+    Label5: TLabel;
+    Label4: TLabel;
+    l_type: TLabel;
+    L_edit: TLabel;
+    GroupBox5: TGroupBox;
+    e_sh_fish: TEdit;
+    E_bestankar: TEdit;
+    e_bedehkar: TEdit;
+    Button2: TButton;
+    Button1: TButton;
+    RadioGroup1: TRadioGroup;
+    G_tarikh: TGroupBox;
+    RadioGroup2: TRadioGroup;
+    E_tarikh: TEdit;
+    DBGrid1: TDBGrid;
+    DataSource1: TDataSource;
+    E_roz: TEdit;
+    Label11: TLabel;
+    E_mah: TEdit;
+    Label12: TLabel;
+    E_sal: TEdit;
+    L_cod: TLabel;
+    Button6: TButton;
+    DBT_fish: TDBText;
+    DBT_bede: TDBText;
+    DBT_bestan: TDBText;
+    dbt_sharh: TDBText;
+    DBT_tarikh: TDBText;
+    Button5: TButton;
+    G_bank: TGroupBox;
+    Label8: TLabel;
+    esearch: TEdit;
+    DBGrid3: TDBGrid;
+    DataSource2: TDataSource;
+    DBT_bank: TDBText;
+    Label1: TLabel;
+    CheckBox1: TCheckBox;
+    scsal: TDBLookupComboBox;
+    DataSource3: TDataSource;
+    L_tarikh: TLabel;
+    L_cod2: TLabel;
+    DBT_code: TDBText;
+    DBT_bestankar: TDBText;
+    DBT_bedehkar: TDBText;
+    procedure RadioGroup11Click(Sender: TObject);
+    procedure type_;
+    procedure RadioGroup1Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    function check:boolean;
+    procedure bank;
+    procedure tarikh;
+    procedure E_tarikhChange(Sender: TObject);
+    procedure E_searchChange(Sender: TObject);
+    procedure RadioGroup2Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
+    procedure delete;
+    procedure e_bedehkarKeyPress(Sender: TObject; var Key: Char);
+    procedure E_bestankarKeyPress(Sender: TObject; var Key: Char);
+    procedure e_jariKeyPress(Sender: TObject; var Key: Char);
+    procedure e_sh_fishKeyPress(Sender: TObject; var Key: Char);
+    procedure E_rozKeyPress(Sender: TObject; var Key: Char);
+    procedure E_mahKeyPress(Sender: TObject; var Key: Char);
+    procedure E_salKeyPress(Sender: TObject; var Key: Char);
+    procedure Button5Click(Sender: TObject);
+    procedure CheckBox1Click(Sender: TObject);
+    procedure eslah_bank;
+    procedure chang_bede_to_bede_tarikh_unchange;
+    procedure chang_bestan_to_bestan_tarikh_unchange;
+    procedure chang_bestan_to_bede_tarikh_unchange;
+    procedure chang_bede_to_bestan_tarikh_unchange;
+
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frm_eslah_bank: Tfrm_eslah_bank;
+
+implementation
+
+uses unt_DataM_forosh, Taghvim, unt_main, unt_add_kharidha,
+  unt_DataMo_shakhs, unt_DataM_final, Unt_add_bank;
+
+{$R *.dfm}
+procedure Tfrm_eslah_bank.chang_bestan_to_bede_tarikh_unchange;
+var tarikh_,tarikh,sharh,sh_fish,sh_hesab:string;
+    bedeh,bestan,mande_kol,first_cod:real;
+begin
+ tarikh_:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+
+   if CheckBox1.Checked then
+    sh_hesab:=scsal.Text
+   else
+    sh_hesab:=DataM_forosh.ADOQ_bank2moshakhasat_kol.AsString;
+
+    sh_fish:=e_sh_fish.Text;
+    sharh:=Memo1.Text;
+    tarikh:=tarikh_;
+    bedeh:=StrToFloat(e_bedehkar.Text);
+    bestan:=StrToFloat(E_bestankar.Text);
+
+    /////////////////////     1     ///////////////////////////////
+    DataM_final.ADOQ_bank3.SQL.Text:='delete from t_bank  where cod='+L_cod2.Caption;
+    DataM_final.ADOQ_bank3.ExecSQL;
+
+    sleep(3000);
+    /////////////////////     1     ///////////////////////////////
+
+    /////////////////////     2     ///////////////////////////////
+
+    DataM_final.ADOQ_bank3.SQL.Text:='select * from t_bank where moshakhasat_kol='+
+    QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+
+    ' and cod >'+L_cod2.Caption+' order by tarikh,cod';
+    DataM_final.ADOQ_bank3.Open;
+
+          if DataM_final.ADOQ_bank3.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_bank3.First;
+            while not(DataM_final.ADOQ_bank3.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.First;
+              DataM_final.ADOQ_temp_bank.SQL.Text:='insert into t_temp_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_bank3moshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_bank3sh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_bank3sharh.AsString)+
+              ','+DataM_final.ADOQ_bank3bedehkar.AsString+','+DataM_final.ADOQ_bank3bestankar.AsString+
+              ','+DataM_final.ADOQ_bank3mande.AsString+
+              ','+QuotedStr(DataM_final.ADOQ_bank3tarikh.AsString)+')';
+              DataM_final.ADOQ_temp_bank.ExecSQL;
+              DataM_final.ADOQ_bank3.Delete;
+            end;
+            sleep(9000);
+          end;
+    /////////////////////     2     ///////////////////////////////
+
+
+    /////////////////////     3    ///////////////////////////////
+
+         DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+         DataM_forosh.ADOQ_mande_bank.Open;
+
+         sleep(7000);
+         mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+    /////////////////////     3     ///////////////////////////////         
+
+    /////////////////////     4     ///////////////////////////////
+          DataM_final.ADOQ_temp_bank.SQL.Text:='select * from t_temp_bank where tarikh='+
+          QuotedStr(tarikh_)+'and bestankar > 0 order by tarikh,cod';
+          DataM_final.ADOQ_temp_bank.Open;
+
+          if DataM_final.ADOQ_temp_bank.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_temp_bank.First;
+            while not(DataM_final.ADOQ_temp_bank.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_temp_bankmoshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banksh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_temp_banksharh.AsString)+
+              ','+DataM_final.ADOQ_temp_bankbedehkar.AsString+','+DataM_final.ADOQ_temp_bankbestankar.AsString+
+              ','+FloatToStr(mande_kol+DataM_final.ADOQ_temp_bankbestankar.Value-DataM_final.ADOQ_temp_bankbedehkar.Value)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banktarikh.AsString)+')';
+
+              DataM_final.ADOQ_bank3.ExecSQL;
+              sleep(7000);
+
+              DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+              DataM_forosh.ADOQ_mande_bank.Open;
+               sleep(7000);
+
+              mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+              DataM_final.ADOQ_temp_bank.Delete;
+              DataM_final.ADOQ_temp_bank.First;
+            end;
+            sleep(9000);
+           end;
+
+           DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+           DataM_forosh.ADOQ_mande_bank.Open;
+           sleep(7000);
+
+           mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+           
+         DataM_forosh.ADOQ_bank2.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+        QuotedStr(DataMo_shakhs.ADOq_show_sh_hesabmoshakhasat_kol.AsString)+
+        ','+QuotedStr(e_sh_fish.Text)+','+QuotedStr(Memo1.Text)+
+        ','+e_bedehkar.Text+','+E_bestankar.Text+','+FloatToStr(mande_kol-bedeh)+','+QuotedStr(E_tarikh.Text)+')';
+         DataM_forosh.ADOQ_bank2.ExecSQL;
+
+         sleep(7000);
+
+         DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+         DataM_forosh.ADOQ_mande_bank.Open;
+         sleep(7000);
+
+              mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+
+          DataM_final.ADOQ_temp_bank.SQL.Text:='select * from t_temp_bank  order by tarikh,cod';
+          DataM_final.ADOQ_temp_bank.Open;
+
+          if DataM_final.ADOQ_temp_bank.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_temp_bank.First;
+            while not(DataM_final.ADOQ_temp_bank.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_temp_bankmoshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banksh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_temp_banksharh.AsString)+
+              ','+DataM_final.ADOQ_temp_bankbedehkar.AsString+','+DataM_final.ADOQ_temp_bankbestankar.AsString+
+              ','+FloatToStr(mande_kol+DataM_final.ADOQ_temp_bankbestankar.Value-DataM_final.ADOQ_temp_bankbedehkar.Value)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banktarikh.AsString)+')';
+
+              DataM_final.ADOQ_bank3.ExecSQL;
+              sleep(7000);
+
+              DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+              DataM_forosh.ADOQ_mande_bank.Open;
+               sleep(7000);
+
+              mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+              DataM_final.ADOQ_temp_bank.Delete;
+              DataM_final.ADOQ_temp_bank.First;
+            end;
+          end;
+    /////////////////////     4     ///////////////////////////////
+end;
+
+procedure Tfrm_eslah_bank.chang_bede_to_bestan_tarikh_unchange;
+var tarikh_,tarikh,sharh,sh_fish,sh_hesab:string;
+    bedeh,bestan,mande_kol,first_cod:real;
+begin
+    tarikh_:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+
+   if CheckBox1.Checked then
+    sh_hesab:=scsal.Text
+   else
+    sh_hesab:=DataM_forosh.ADOQ_bank2moshakhasat_kol.AsString;
+
+    sh_fish:=e_sh_fish.Text;
+    sharh:=Memo1.Text;
+    tarikh:=tarikh_;
+    bedeh:=StrToFloat(e_bedehkar.Text);
+    bestan:=StrToFloat(E_bestankar.Text);
+
+    /////////////////////     1     ///////////////////////////////
+    DataM_final.ADOQ_bank3.SQL.Text:='delete from t_bank  where cod='+L_cod2.Caption;
+    DataM_final.ADOQ_bank3.ExecSQL;
+
+    sleep(3000);
+    /////////////////////     1     ///////////////////////////////
+
+    /////////////////////     2     ///////////////////////////////
+
+    DataM_final.ADOQ_bank2.SQL.Text:='select * from t_bank where moshakhasat_kol='+
+    QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+
+    ' and bedehkar > 0  order by tarikh,cod';
+    DataM_final.ADOQ_bank2.Open;
+    sleep(1000);
+
+    DataM_final.ADOQ_bank2.First;
+
+    DataM_final.ADOQ_bank3.SQL.Text:='select * from t_bank where moshakhasat_kol='+
+    QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+
+    ' and cod >='+DataM_final.ADOQ_bank2cod.AsString+' order by tarikh,cod';
+    DataM_final.ADOQ_bank3.Open;
+
+          if DataM_final.ADOQ_bank3.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_bank3.First;
+            while not(DataM_final.ADOQ_bank3.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.First;
+              DataM_final.ADOQ_temp_bank.SQL.Text:='insert into t_temp_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_bank3moshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_bank3sh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_bank3sharh.AsString)+
+              ','+DataM_final.ADOQ_bank3bedehkar.AsString+','+DataM_final.ADOQ_bank3bestankar.AsString+
+              ','+DataM_final.ADOQ_bank3mande.AsString+
+              ','+QuotedStr(DataM_final.ADOQ_bank3tarikh.AsString)+')';
+              DataM_final.ADOQ_temp_bank.ExecSQL;
+              DataM_final.ADOQ_bank3.Delete;
+            end;
+            sleep(9000);
+          end;
+    /////////////////////     2     ///////////////////////////////
+
+
+    /////////////////////     3    ///////////////////////////////
+
+         DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+         DataM_forosh.ADOQ_mande_bank.Open;
+
+         sleep(7000);
+         mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+        DataM_forosh.ADOQ_bank2.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+        QuotedStr(DataMo_shakhs.ADOq_show_sh_hesabmoshakhasat_kol.AsString)+
+        ','+QuotedStr(e_sh_fish.Text)+','+QuotedStr(Memo1.Text)+
+        ','+e_bedehkar.Text+','+E_bestankar.Text+','+FloatToStr(mande_kol+bestan)+','+QuotedStr(E_tarikh.Text)+')';
+         DataM_forosh.ADOQ_bank2.ExecSQL;
+         sleep(7000);
+
+    /////////////////////     3     ///////////////////////////////         
+
+    /////////////////////     4     ///////////////////////////////
+
+         DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+         DataM_forosh.ADOQ_mande_bank.Open;
+
+         sleep(7000);
+         mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+             
+          DataM_final.ADOQ_temp_bank.SQL.Text:='select * from t_temp_bank  order by tarikh,cod';
+          DataM_final.ADOQ_temp_bank.Open;
+
+          if DataM_final.ADOQ_temp_bank.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_temp_bank.First;
+            while not(DataM_final.ADOQ_temp_bank.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_temp_bankmoshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banksh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_temp_banksharh.AsString)+
+              ','+DataM_final.ADOQ_temp_bankbedehkar.AsString+','+DataM_final.ADOQ_temp_bankbestankar.AsString+
+              ','+FloatToStr(mande_kol+DataM_final.ADOQ_temp_bankbestankar.Value-DataM_final.ADOQ_temp_bankbedehkar.Value)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banktarikh.AsString)+')';
+
+              DataM_final.ADOQ_bank3.ExecSQL;
+              sleep(7000);
+
+              DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+              DataM_forosh.ADOQ_mande_bank.Open;
+               sleep(7000);
+
+              mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+              DataM_final.ADOQ_temp_bank.Delete;
+              DataM_final.ADOQ_temp_bank.First;
+            end;
+
+      end;
+    /////////////////////     4     ///////////////////////////////
+end;
+
+
+///////////////////////////////////////////////////////
+procedure Tfrm_eslah_bank.chang_bestan_to_bestan_tarikh_unchange;
+var tarikh_,tarikh,sharh,sh_fish,sh_hesab:string;
+    bedeh,bestan,mande_kol,first_cod:real;
+begin
+    tarikh_:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+
+   if CheckBox1.Checked then
+    sh_hesab:=scsal.Text
+   else
+    sh_hesab:=DataM_forosh.ADOQ_bank2moshakhasat_kol.AsString;
+
+    sh_fish:=e_sh_fish.Text;
+    sharh:=Memo1.Text;
+    tarikh:=tarikh_;
+    bedeh:=StrToFloat(e_bedehkar.Text);
+    bestan:=StrToFloat(E_bestankar.Text);
+
+         DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+
+         QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+' and cod < '+L_cod2.Caption;
+         DataM_forosh.ADOQ_mande_bank.Open;
+
+         sleep(7000);
+
+          DataM_final.ADOQ_bank3.SQL.Text:='update t_bank set sh_fish='+
+          QuotedStr(e_sh_fish.Text)+',bestankar='+FloatToStr(bestan)+
+          ',sharh='+QuotedStr(sharh)+',mande='+FloatToStr(bestan+DataM_forosh.ADOQ_mande_bankmande_kol.Value)+' where cod='+L_cod2.Caption;
+
+           DataM_final.ADOQ_bank3.ExecSQL;
+
+
+          DataM_final.ADOQ_bank3.SQL.Text:='select * from t_bank where moshakhasat_kol='+
+          QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+' and cod >'+L_cod2.Caption+
+          ' order by tarikh,cod';
+          DataM_final.ADOQ_bank3.Open;
+
+          if DataM_final.ADOQ_bank3.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_bank3.First;
+            while not(DataM_final.ADOQ_bank3.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.First;
+              DataM_final.ADOQ_temp_bank.SQL.Text:='insert into t_temp_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_bank3moshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_bank3sh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_bank3sharh.AsString)+
+              ','+DataM_final.ADOQ_bank3bedehkar.AsString+','+DataM_final.ADOQ_bank3bestankar.AsString+
+              ','+DataM_final.ADOQ_bank3mande.AsString+
+              ','+QuotedStr(DataM_final.ADOQ_bank3tarikh.AsString)+')';
+              DataM_final.ADOQ_temp_bank.ExecSQL;
+              DataM_final.ADOQ_bank3.Delete;
+            end;
+            sleep(9000);
+          end;
+
+         DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+         DataM_forosh.ADOQ_mande_bank.Open;
+
+         sleep(7000);
+
+         mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+
+          DataM_final.ADOQ_temp_bank.SQL.Text:='select * from t_temp_bank  order by tarikh,cod';
+          DataM_final.ADOQ_temp_bank.Open;
+
+          if DataM_final.ADOQ_temp_bank.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_temp_bank.First;
+            while not(DataM_final.ADOQ_temp_bank.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_temp_bankmoshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banksh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_temp_banksharh.AsString)+
+              ','+DataM_final.ADOQ_temp_bankbedehkar.AsString+','+DataM_final.ADOQ_temp_bankbestankar.AsString+
+              ','+FloatToStr(mande_kol+DataM_final.ADOQ_temp_bankbestankar.Value-DataM_final.ADOQ_temp_bankbedehkar.Value)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banktarikh.AsString)+')';
+
+              DataM_final.ADOQ_bank3.ExecSQL;
+              sleep(7000);
+
+              DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+              DataM_forosh.ADOQ_mande_bank.Open;
+               sleep(7000);
+
+              mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+              DataM_final.ADOQ_temp_bank.Delete;
+              DataM_final.ADOQ_temp_bank.First;
+            end;
+            sleep(9000);
+
+      end;/// bestan >>>> bestan
+end;
+procedure Tfrm_eslah_bank.chang_bede_to_bede_tarikh_unchange;
+var tarikh_,tarikh,sharh,sh_fish,sh_hesab:string;
+    bedeh,bestan,mande_kol,first_cod:real;
+begin
+    tarikh_:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+
+   if CheckBox1.Checked then
+    sh_hesab:=scsal.Text
+   else
+    sh_hesab:=DataM_forosh.ADOQ_bank2moshakhasat_kol.AsString;
+
+    sh_fish:=e_sh_fish.Text;
+    sharh:=Memo1.Text;
+    tarikh:=tarikh_;
+    bedeh:=StrToFloat(e_bedehkar.Text);
+    bestan:=StrToFloat(E_bestankar.Text);
+
+      DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+
+         QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+' and cod < '+L_cod2.Caption;
+         DataM_forosh.ADOQ_mande_bank.Open;
+
+         sleep(7000);
+
+          DataM_final.ADOQ_bank3.SQL.Text:='update t_bank set sh_fish='+
+          QuotedStr(e_sh_fish.Text)+',bedehkar='+FloatToStr(bedeh)+
+          ',sharh='+QuotedStr(sharh)+',mande='+FloatToStr(DataM_forosh.ADOQ_mande_bankmande_kol.Value-bedeh)+' where cod='+L_cod2.Caption;
+
+           DataM_final.ADOQ_bank3.ExecSQL;
+
+
+          DataM_final.ADOQ_bank3.SQL.Text:='select * from t_bank where moshakhasat_kol='+
+          QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+' and cod >'+L_cod2.Caption+
+          ' order by tarikh,cod';
+          DataM_final.ADOQ_bank3.Open;
+
+          if DataM_final.ADOQ_bank3.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_bank3.First;
+            while not(DataM_final.ADOQ_bank3.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.First;
+              DataM_final.ADOQ_temp_bank.SQL.Text:='insert into t_temp_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_bank3moshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_bank3sh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_bank3sharh.AsString)+
+              ','+DataM_final.ADOQ_bank3bedehkar.AsString+','+DataM_final.ADOQ_bank3bestankar.AsString+
+              ','+DataM_final.ADOQ_bank3mande.AsString+
+              ','+QuotedStr(DataM_final.ADOQ_bank3tarikh.AsString)+')';
+              DataM_final.ADOQ_temp_bank.ExecSQL;
+              DataM_final.ADOQ_bank3.Delete;
+            end;
+            sleep(9000);
+          end;
+
+         DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+         DataM_forosh.ADOQ_mande_bank.Open;
+
+         sleep(7000);
+
+         mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+
+          DataM_final.ADOQ_temp_bank.SQL.Text:='select * from t_temp_bank  order by tarikh,cod';
+          DataM_final.ADOQ_temp_bank.Open;
+
+          if DataM_final.ADOQ_temp_bank.RecordCount >0 then
+          begin
+            DataM_final.ADOQ_temp_bank.First;
+            while not(DataM_final.ADOQ_temp_bank.Eof)do
+            begin
+              DataM_final.ADOQ_bank3.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+              QuotedStr(DataM_final.ADOQ_temp_bankmoshakhasat_kol.AsString)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banksh_fish.AsString)+','+
+              QuotedStr(DataM_final.ADOQ_temp_banksharh.AsString)+
+              ','+DataM_final.ADOQ_temp_bankbedehkar.AsString+','+DataM_final.ADOQ_temp_bankbestankar.AsString+
+              ','+FloatToStr(mande_kol+DataM_final.ADOQ_temp_bankbestankar.Value-DataM_final.ADOQ_temp_bankbedehkar.Value)+
+              ','+QuotedStr(DataM_final.ADOQ_temp_banktarikh.AsString)+')';
+
+              DataM_final.ADOQ_bank3.ExecSQL;
+              sleep(7000);
+
+              DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+              DataM_forosh.ADOQ_mande_bank.Open;
+               sleep(7000);
+
+              mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+              DataM_final.ADOQ_temp_bank.Delete;
+              DataM_final.ADOQ_temp_bank.First;
+            end;
+            sleep(9000);
+
+
+      end;// bedeh >>>> bedeh
+end;
+//////////////////////////////////////////////////////
+procedure Tfrm_eslah_bank.delete;
+var tarikh_,tarikh,sharh,sh_fish,sh_hesab:string;
+    bedeh,bestan,mande_kol,first_cod:real;
+begin
+   tarikh_:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+
+    L_cod.Caption:=DataM_final.ADOQ_bank4cod.AsString;
+    L_cod2.Caption:=L_cod.Caption;
+
+    DataM_final.ADOQ_bank3.SQL.Text:='select * from t_bank where moshakhasat_kol='+
+    QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+' order by tarikh,cod';
+
+    DataM_final.ADOQ_bank3.Open;
+    DataM_final.ADOQ_bank3.Last;
+
+    sleep(3000);
+    if (L_cod.Caption=DataM_final.ADOQ_bank3cod.AsString) then
+    begin
+      DataM_final.ADOQ_bank3.SQL.Text:='delete * from t_bank where cod='+L_cod2.Caption;
+      DataM_final.ADOQ_bank3.ExecSQL;
+    end
+    else
+    begin
+      DataM_final.ADOQ_bank3.SQL.Text:='select * from t_bank where moshakhasat_kol='+
+      QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+
+      ' and cod >'+L_cod2.Caption+' order by tarikh,cod';
+
+      DataM_final.ADOQ_bank3.Open;
+
+      if DataM_final.ADOQ_bank3.RecordCount >0 then
+      begin
+        DataM_final.ADOQ_bank3.First;
+        while not(DataM_final.ADOQ_bank3.Eof)do
+        begin
+         DataM_final.ADOQ_bank3.First;
+          DataM_final.ADOQ_temp_bank.SQL.Text:='insert into t_temp_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+         QuotedStr(DataM_final.ADOQ_bank3moshakhasat_kol.AsString)+
+          ','+QuotedStr(DataM_final.ADOQ_bank3sh_fish.AsString)+','+
+         QuotedStr(DataM_final.ADOQ_bank3sharh.AsString)+
+         ','+DataM_final.ADOQ_bank3bedehkar.AsString+','+DataM_final.ADOQ_bank3bestankar.AsString+
+          ','+DataM_final.ADOQ_bank3mande.AsString+
+          ','+QuotedStr(DataM_final.ADOQ_bank3tarikh.AsString)+')';
+         DataM_final.ADOQ_temp_bank.ExecSQL;
+         DataM_final.ADOQ_bank3.Delete;
+        end;
+
+      end;
+
+      DataM_final.ADOQ_bank3.SQL.Text:='delete from t_bank where cod ='+L_cod2.Caption;
+      DataM_final.ADOQ_bank3.ExecSQL;
+
+   ///////////////////////////////////////////////////
+
+      sleep(7000);
+      
+      DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+      DataM_forosh.ADOQ_mande_bank.Open;
+
+
+      mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+
+
+      DataM_final.ADOQ_temp_bank.SQL.Text:='select * from t_temp_bank  order by tarikh';
+      DataM_final.ADOQ_temp_bank.Open;
+
+      if DataM_final.ADOQ_temp_bank.RecordCount >0 then
+      begin
+        DataM_final.ADOQ_temp_bank.First;
+        while not(DataM_final.ADOQ_temp_bank.Eof)do
+        begin
+
+          DataM_final.ADOQ_bank3.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+          QuotedStr(DataM_final.ADOQ_temp_bankmoshakhasat_kol.AsString)+
+          ','+QuotedStr(DataM_final.ADOQ_temp_banksh_fish.AsString)+','+
+          QuotedStr(DataM_final.ADOQ_temp_banksharh.AsString)+
+          ','+DataM_final.ADOQ_temp_bankbedehkar.AsString+','+DataM_final.ADOQ_temp_bankbestankar.AsString+
+          ','+FloatToStr(mande_kol+DataM_final.ADOQ_temp_bankbestankar.Value-DataM_final.ADOQ_temp_bankbedehkar.Value)+
+          ','+QuotedStr(DataM_final.ADOQ_temp_banktarikh.AsString)+')';
+
+          DataM_final.ADOQ_bank3.ExecSQL;
+          sleep(7000);
+
+          DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+          DataM_forosh.ADOQ_mande_bank.Open;
+          mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+          DataM_final.ADOQ_temp_bank.Delete;
+          DataM_final.ADOQ_temp_bank.First;
+        end;
+      end;
+  //////////////////////////////////////////////////////////////////////
+
+      sleep(7000);
+
+      DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+      DataM_forosh.ADOQ_mande_bank.Open;
+      mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+      DataM_final.ADOQ_temp_bank.SQL.Text:='select * from t_temp_bank  order by tarikh';
+      DataM_final.ADOQ_temp_bank.Open;
+
+
+      if DataM_final.ADOQ_temp_bank.RecordCount >0 then
+      begin
+        DataM_final.ADOQ_temp_bank.First;
+        while not(DataM_final.ADOQ_temp_bank.Eof)do
+        begin
+          DataM_final.ADOQ_bank3.SQL.Text:='insert into t_bank(moshakhasat_kol,sh_fish,sharh,bedehkar,bestankar,mande,tarikh)values('+
+          QuotedStr(DataM_final.ADOQ_temp_bankmoshakhasat_kol.AsString)+
+          ','+QuotedStr(DataM_final.ADOQ_temp_banksh_fish.AsString)+','+
+          QuotedStr(DataM_final.ADOQ_temp_banksharh.AsString)+
+          ','+DataM_final.ADOQ_temp_bankbedehkar.AsString+','+DataM_final.ADOQ_temp_bankbestankar.AsString+
+          ','+FloatToStr(mande_kol+DataM_final.ADOQ_temp_bankbestankar.Value-DataM_final.ADOQ_temp_bankbedehkar.Value)+
+          ','+QuotedStr(DataM_final.ADOQ_temp_banktarikh.AsString)+')';
+          DataM_final.ADOQ_bank3.ExecSQL;
+          sleep(7000);
+          DataM_final.ADOQ_bank3.SQL.Text:='select * from t_bank  where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+          DataM_final.ADOQ_bank3.Open;
+          DataM_final.ADOQ_bank3.Last;
+          DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString);
+          DataM_forosh.ADOQ_mande_bank.Open;
+          mande_kol:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+          DataM_final.ADOQ_temp_bank.Delete;
+          DataM_final.ADOQ_temp_bank.First;
+        end;
+      end;
+    end;////////
+
+    MessageBox(Handle,'„Ê—œ »«‰òÌ «‰ Œ«»Ì Õ–› ê—œÌœ.',' ÊÃÂ !',MB_OK or MB_ICONINFORMATION or MB_RIGHT or MB_RTLREADING);
+end;
+
+
+procedure Tfrm_eslah_bank.eslah_bank;
+var tarikh_,tarikh,sharh,sh_fish,sh_hesab:string;
+    bedeh,bestan,mande_kol,first_cod:real;
+begin
+    tarikh_:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+
+   if CheckBox1.Checked then
+    sh_hesab:=scsal.Text
+   else
+    sh_hesab:=DataM_forosh.ADOQ_bank2moshakhasat_kol.AsString;
+
+    sh_fish:=e_sh_fish.Text;
+    sharh:=Memo1.Text;
+    tarikh:=tarikh_;
+    bedeh:=StrToFloat(e_bedehkar.Text);
+    bestan:=StrToFloat(E_bestankar.Text);
+
+    if (tarikh_=DBT_tarikh.Caption) then //tarikh unchange
+    begin
+
+    if (bestan > 0) and (strtofloat(DBT_bede.Caption)>0) then /// bestan >>>> bestan
+        begin
+          chang_bede_to_bestan_tarikh_unchange;
+        end;
+        if (bedeh > 0) and (strtofloat(DBT_bestan.Caption)>0) then /// bestan >>>> bestan
+        begin
+          chang_bestan_to_bede_tarikh_unchange;
+        end;
+        //////////////////////////////////////////
+
+        if (bedeh > 0)and (strtofloat(DBT_bede.Caption)>0)  then // bedeh >>>> bedeh
+        begin
+          chang_bede_to_bede_tarikh_unchange;
+        end;
+        if (bestan > 0) and (strtofloat(DBT_bestan.Caption)>0) then /// bestan >>>> bestan
+        begin
+          chang_bestan_to_bestan_tarikh_unchange;
+        end;
+        MessageBox(Handle,'„Ê—œ »«‰òÌ «‰ Œ«»Ì «’·«Õ ê—œÌœ.',' ÊÃÂ !',MB_OK or MB_ICONINFORMATION or MB_RIGHT or MB_RTLREADING);
+        ///////////////////////////////////////////////////////
+    end
+    else
+    begin // TARIKH CHANG
+       MessageBox(Handle,'„Ê—œ »«‰òÌ —« Õ–› Ê œÊ»«—Â «÷«›Â ‰„«ÌÌœ .','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+    end;// TARIKH CHANG
+end;
+
+procedure Tfrm_eslah_bank.bank;
+begin
+  DataM_final.ADOQ_bank4.SQL.Text:='select * from t_bank where moshakhasat_kol='+QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+' order by cod,tarikh';
+  DataM_final.ADOQ_bank4.Open;
+end;
+
+procedure Tfrm_eslah_bank.tarikh;
+begin
+  DataM_final.ADOQ_bank4.SQL.Text:='select * from t_bank where tarikh='+QuotedStr(E_tarikh.Text)+' order by cod,moshakhasat_kol';
+  DataM_final.ADOQ_bank4.Open;
+end;
+
+
+ procedure Tfrm_eslah_bank.type_;
+ begin
+   if RadioGroup1.ItemIndex=0 then
+    begin
+      G_bank.Visible:=true;
+      G_tarikh.Visible:=false;
+      bank;
+    end;
+    if RadioGroup1.ItemIndex=1 then
+    begin
+      G_bank.Visible:=false;
+      G_tarikh.Visible:=true;
+      tarikh;
+    end;
+
+ end;
+
+
+procedure Tfrm_eslah_bank.RadioGroup11Click(Sender: TObject);
+begin
+if RadioGroup2.ItemIndex=1 then
+  Begin
+    _taghvim.ShowModal;
+    E_tarikh.Text:=_taghvim._str_date;
+    if E_tarikh.Text='' then
+      E_tarikh.Text:=frm_main.E_tarikh.Text;
+  end
+  else
+  E_tarikh.Text:=frm_main.E_tarikh.Text;
+end;
+
+procedure Tfrm_eslah_bank.RadioGroup1Click(Sender: TObject);
+begin
+type_;
+end;
+procedure Tfrm_eslah_bank.FormShow(Sender: TObject);
+begin
+  CheckBox1.Checked:=false;
+  if CheckBox1.Checked then
+ begin
+  Label1.Visible:=true;
+  scsal.Visible:=true;
+ end
+ else
+ begin
+  Label1.Visible:=false;
+  scsal.Visible:=false;
+ end;
+  DataMo_shakhs.show_sh_hesab;
+  RadioGroup2.ItemIndex:=0;
+  E_tarikh.Text:=frm_main.E_tarikh.Text;
+  RadioGroup1.ItemIndex:=4;
+  type_;
+end;
+procedure Tfrm_eslah_bank.E_tarikhChange(Sender: TObject);
+begin
+ tarikh;
+   if frm_eslah_bank.DBT_fish.Caption<>''  then
+    begin
+    frm_eslah_bank.e_sh_fish.Visible:=true;
+    frm_eslah_bank.e_bedehkar.Visible:=true;
+    frm_eslah_bank.E_bestankar.Visible:=true;
+    frm_eslah_bank.Memo1.Visible:=true;
+    frm_eslah_bank.E_roz.Visible:=true;
+    frm_eslah_bank.E_mah.Visible:=true;
+    frm_eslah_bank.E_sal.Visible:=true;
+    frm_eslah_bank.Button1.Visible:=true;  
+  end
+  else
+  begin
+    frm_eslah_bank.e_sh_fish.Visible:=false;
+    frm_eslah_bank.e_bedehkar.Visible:=false;
+    frm_eslah_bank.E_bestankar.Visible:=false;
+    frm_eslah_bank.Memo1.Visible:=false;
+    frm_eslah_bank.E_roz.Visible:=false;
+    frm_eslah_bank.E_mah.Visible:=false;
+    frm_eslah_bank.E_sal.Visible:=false;
+    frm_eslah_bank.Button1.Visible:=false;
+  end;
+end;
+
+procedure Tfrm_eslah_bank.E_searchChange(Sender: TObject);
+begin
+ DataMo_shakhs.ADOq_show_sh_hesab2.Locate('moshakhasat_kol',esearch.Text,[loPartialKey]);
+
+end;
+
+//////////////////////////////////////////////////////////////////
+function Tfrm_eslah_bank.check:boolean;
+begin
+  check:=true;
+  if ((CheckBox1.Checked) and (scsal.Text=''))or(E_sal.Text='')or(E_mah.Text='')or(E_roz.Text='')or(e_sh_fish.Text='') then
+  begin
+     check:=false;
+     MessageBox(Handle,'›Ì·œÂ«Ì ” «—Â œ«— »«Ìœ Ê«—œ ‘Ê‰œ.','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+  end
+  else
+  begin
+    if E_bestankar.Text=''then
+      E_bestankar.Text:='0';
+    if (e_bedehkar.Text='') then
+      e_bedehkar.Text:='0';
+
+    if (e_bedehkar.Text='0')and(E_bestankar.Text='0') then
+    begin
+      check:=false;
+      MessageBox(Handle,'»«Ìœ »” «‰ò«— Ì« »œÂò«— Ê«—œ ‘Êœ.','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+    end;
+
+    if (e_bedehkar.Text<>'0') and(E_bestankar.Text<>'0') then
+    begin
+      check:=false;
+      MessageBox(Handle,'»«Ìœ ›ﬁÿ »” «‰ò«— Ì« ›ﬁÿ »œÂò«— Ê«—œ ‘Êœ.','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+    end;
+  end;
+end;
+
+procedure Tfrm_eslah_bank.Button2Click(Sender: TObject);
+begin
+close;
+end;
+
+procedure Tfrm_eslah_bank.Button1Click(Sender: TObject);
+var tarikh_:string;
+    mande:real;
+    pch:pchar;
+begin
+  tarikh_:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+    L_cod.Caption:=DataM_final.ADOQ_bank4cod.AsString;
+    L_cod2.Caption:=L_cod.Caption;
+if DBT_bank.Caption='' then
+  MessageBox(Handle,' —òÊ—œÌ »—«Ì –ŒÌ—Â ÊÃÊœ ‰œ«—œ.','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING)
+else
+begin
+  If check then
+   begin //4
+   if (e_bedehkar.Text<>'0')and(StrToFloat(DBT_bestan.Caption)>0)  then
+   begin
+      DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+
+      QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+
+      ' and tarikh <='+QuotedStr(tarikh_);
+      DataM_forosh.ADOQ_mande_bank.Open;
+      sleep(7000);
+      mande:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+   end;
+
+   if (e_bedehkar.Text<>'0')and(StrToFloat(DBT_bede.Caption)>0)  then
+   begin
+      DataM_forosh.ADOQ_mande_bank.SQL.Text:='select sum(bestankar-bedehkar) as mande_kol from t_bank where moshakhasat_kol='+
+      QuotedStr(DataMo_shakhs.ADOq_show_sh_hesab2moshakhasat_kol.AsString)+
+      ' and cod <'+L_cod2.Caption;
+      DataM_forosh.ADOQ_mande_bank.Open;
+      sleep(7000);
+      mande:=DataM_forosh.ADOQ_mande_bankmande_kol.Value;
+   end;
+
+    if not(CheckBox1.Checked )and(L_tarikh.Caption=tarikh_)and(DBT_bestankar.Caption=trim(E_bestankar.Text))and(DBT_bedehkar.Caption=trim(e_bedehkar.Text)) then
+    begin
+          DataM_final.ADOQ_bank3.SQL.Text:='update t_bank set sh_fish='+
+          QuotedStr(e_sh_fish.Text)+' where cod='+L_cod.Caption;
+
+           DataM_final.ADOQ_bank3.ExecSQL;
+            MessageBox(Handle,'„Ê—œ »«‰òÌ «‰ Œ«»Ì «’·«Õ ê—œÌœ.',' ÊÃÂ !',MB_OK or MB_ICONINFORMATION or MB_RIGHT or MB_RTLREADING);
+           type_;
+    end
+    else
+    begin//3
+      if (e_bedehkar.Text<>'0')  then
+      begin //2
+        if(StrToFloat(e_bedehkar.Text)>mande) then
+        begin //1
+         pch:=pchar(' „»·€ Ê«—œ ‘œÂ »—«Ì »—œ«‘  «“ Õ”«» «“ „«‰œÂ Õ”«» = '+FloatToStr(mande)+'  »Ì‘ — „Ì»«‘œ. ');
+         MessageBox(Handle,pch,'Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+        end
+        else
+        begin
+          eslah_bank;
+          type_;
+        end;//1
+      end //2
+      else
+       begin
+        eslah_bank;
+        type_;
+       end; //2
+   end;//3
+  end;//4
+
+end;
+
+end;
+
+
+procedure Tfrm_eslah_bank.RadioGroup2Click(Sender: TObject);
+begin
+if RadioGroup2.ItemIndex=1 then
+  Begin
+    _taghvim.ShowModal;
+    E_tarikh.Text:=_taghvim._str_date;
+    if E_tarikh.Text='' then
+      E_tarikh.Text:=frm_main.E_tarikh.Text;
+  end
+  else
+  E_tarikh.Text:=frm_main.E_tarikh.Text;
+end;
+
+procedure Tfrm_eslah_bank.Button6Click(Sender: TObject);
+begin
+if DBT_bank.Caption <>'' then
+begin
+  if MessageBox(Handle,'„Ê—œ »«‰òÌ «‰ Œ«»Ì Õ–› ê—œœ ø',' ÊÃÂ  !',MB_YESNO or MB_ICONQUESTION or MB_RIGHT or MB_RTLREADING)=id_yes then
+  begin
+    delete;
+    type_;
+  end;
+end
+else
+  MessageBox(Handle,' —òÊ—œÌ »—«Ì Õ–› ÊÃÊœ ‰œ«—œ.','Œÿ« !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+end;
+procedure Tfrm_eslah_bank.e_bedehkarKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_eslah_bank.E_bestankarKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_eslah_bank.e_jariKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_eslah_bank.e_sh_fishKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_eslah_bank.E_rozKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_eslah_bank.E_mahKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_eslah_bank.E_salKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_eslah_bank.Button5Click(Sender: TObject);
+begin
+frm_add_kharidha.show_calculator;
+end;
+
+procedure Tfrm_eslah_bank.CheckBox1Click(Sender: TObject);
+begin
+ if CheckBox1.Checked then
+ begin
+  Label1.Visible:=true;
+  scsal.Visible:=true;
+ end
+ else
+ begin
+  Label1.Visible:=false;
+  scsal.Visible:=false;
+ end;
+end;
+
+end.
+

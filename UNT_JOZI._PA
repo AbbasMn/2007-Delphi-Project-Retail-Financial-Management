@@ -1,0 +1,222 @@
+unit unt_joziat_pardakht_Be_foroshande;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, SUIButton, StdCtrls, dxCore, dxButtons, DBCtrls, Grids, DBGrids,
+  ExtCtrls, SUIForm, DB;
+
+type
+  TFrm_joziat_pardakht_Be_foroshande = class(TForm)
+    suiForm1: TsuiForm;
+    G_shakhs: TGroupBox;
+    Label6: TLabel;
+    Label1: TLabel;
+    Label5: TLabel;
+    E_search: TEdit;
+    DBGrid2: TDBGrid;
+    scsal: TDBLookupComboBox;
+    dxToolButton1: TdxToolButton;
+    Edit1: TEdit;
+    GroupBox1: TGroupBox;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    E_roz: TEdit;
+    E_mah: TEdit;
+    E_sal: TEdit;
+    Button1: TButton;
+    GroupBox2: TGroupBox;
+    Label7: TLabel;
+    Label9: TLabel;
+    Label11: TLabel;
+    Label8: TLabel;
+    Label10: TLabel;
+    Label12: TLabel;
+    E_roz_ebteda: TEdit;
+    E_mah_ebteda: TEdit;
+    E_sal_ebteda: TEdit;
+    E_roz_enteha: TEdit;
+    E_mah_enteha: TEdit;
+    E_sal_enteha: TEdit;
+    btaeedall: TsuiButton;
+    DataSource1: TDataSource;
+    DataSource2: TDataSource;
+    DBGrid1: TDBGrid;
+    DataSource3: TDataSource;
+    L_type: TLabel;
+    CheckBox1: TCheckBox;
+    L_sh_kh: TLabel;
+    L_tarikh: TLabel;
+    L_family: TLabel;
+    L_name: TLabel;
+    procedure FormShow(Sender: TObject);
+    procedure show_joz_sal;
+    procedure show_joz_tarikh;
+    procedure show_joz_bein_tarikh;
+    procedure scsalClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure btaeedallClick(Sender: TObject);
+    procedure E_searchChange(Sender: TObject);
+    procedure Edit1Change(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+    procedure dxToolButton1Click(Sender: TObject);
+    procedure show_joz_sh_kh;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_joziat_pardakht_Be_foroshande: TFrm_joziat_pardakht_Be_foroshande;
+
+implementation
+
+uses unt_DataMo_shakhs, unt_DataM_forosh, unt_DataM_final,
+  unt_print_joziat_par_be_foro, unt_print_joziat_par_be_foro_sh_kh;
+
+{$R *.dfm}
+procedure TFrm_joziat_pardakht_Be_foroshande.show_joz_sh_kh;
+begin
+  DataM_final.ADOQ_joziat_bedehi_khar_sh_kh.SQL.Text:='select sh_kh,tarikh,name,family,mande from t_forosh where mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and tarikh='+QuotedStr(l_tarikh.Caption)+' and sh_kh='+L_sh_kh.Caption+' order by tarikh,sh_kh';
+   DataM_final.ADOQ_joziat_bedehi_khar_sh_kh.Open;
+
+
+   DataM_final.ADOQ_sum_mande_sh_kh.SQL.Text:='select sum(mande) as mande_kol from t_forosh where mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and tarikh='+QuotedStr(l_tarikh.Caption)+' and sh_kh='+L_sh_kh.Caption;
+  DataM_final.ADOQ_sum_mande_sh_kh.Open;
+
+  Frm_print_joziat_par_be_foro_sh_kh.QRL_type.Caption:=' ÈÑÇí ÎÑíÏ ÔãÇÑå '+L_sh_kh.Caption+ ' ÏÑ ÊÇÑíÎ '+L_tarikh.Caption;
+end;
+
+procedure  TFrm_joziat_pardakht_Be_foroshande.show_joz_bein_tarikh;
+var tarikh1,tarikh2:string;
+begin
+   tarikh1:=trim(E_sal_ebteda.Text)+'/'+trim(E_mah_ebteda.Text)+'/'+trim(E_roz_ebteda.Text);
+   tarikh2:=trim(E_sal_enteha.Text)+'/'+trim(E_mah_enteha.Text)+'/'+trim(E_roz_enteha.Text);
+
+  DataM_final.ADOQ_joziat_bedehi_khar.SQL.Text:='select sh_kh,tarikh,name,family,mande from t_forosh where  mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and tarikh between '+QuotedStr(tarikh1)+' and '+QuotedStr(tarikh2)+' order by tarikh,sh_kh';
+   DataM_final.ADOQ_joziat_bedehi_khar.Open;
+   L_type.Caption:=' ÎÑíÏÇÑ '+DataMo_shakhs.ADOQ_kharidarfamily.AsString+' '+DataMo_shakhs.ADOQ_kharidarname.AsString+
+   '  ÇÒ ÊÇÑíÎ '+ tarikh1+ ' ÊÇ ÊÇÑíÎ'+tarikh2;
+
+  DataM_final.ADOQ_sum_mande.SQL.Text:='select sum(mande) as mande_kol from t_forosh where  mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and tarikh between '+QuotedStr(tarikh1)+' and '+QuotedStr(tarikh2);
+    DataM_final.ADOQ_sum_mande.Open;
+
+   Frm_print_joziat_par_be_foro.QRL_type.Caption:= L_type.Caption;
+end;
+
+procedure  TFrm_joziat_pardakht_Be_foroshande.show_joz_tarikh;
+var tarikh:string;
+begin
+  tarikh:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+
+  DataM_final.ADOQ_joziat_bedehi_khar.SQL.Text:='select sh_kh,tarikh,name,family,mande from t_forosh where mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and tarikh='+QuotedStr(tarikh)+' order by tarikh,sh_kh';
+   DataM_final.ADOQ_joziat_bedehi_khar.Open;
+   L_type.Caption:=' ÎÑíÏÇÑ '+DataMo_shakhs.ADOQ_kharidarfamily.AsString+' '+DataMo_shakhs.ADOQ_kharidarname.AsString+
+   ' ÏÑ  ÊÇÑíÎ '+ tarikh;
+
+   Frm_print_joziat_par_be_foro.QRL_type.Caption:= L_type.Caption;
+
+   DataM_final.ADOQ_sum_mande.SQL.Text:='select sum(mande) as mande_kol from t_forosh where mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and tarikh='+QuotedStr(tarikh);
+  DataM_final.ADOQ_sum_mande.Open;
+
+end;
+procedure  TFrm_joziat_pardakht_Be_foroshande.show_joz_sal;
+begin
+  DataM_final.ADOQ_joziat_bedehi_khar.SQL.Text:='select sh_kh,tarikh,name,family,mande from t_forosh where mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and sal='+QuotedStr(scsal.Text)+' order by tarikh,sh_kh';
+   DataM_final.ADOQ_joziat_bedehi_khar.Open;
+   L_type.Caption:=' ÎÑíÏÇÑ '+DataMo_shakhs.ADOQ_kharidarfamily.AsString+' '+DataMo_shakhs.ADOQ_kharidarname.AsString+
+   ' ÏÑ ÓÇá '+scsal.Text;
+
+     DataM_final.ADOQ_sum_mande.SQL.Text:='select sum(mande) as mande_kol from t_forosh  where mande >0 and name_kh='+
+  QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and sal='+QuotedStr(scsal.Text);
+    DataM_final.ADOQ_sum_mande.Open;
+   Frm_print_joziat_par_be_foro.QRL_type.Caption:= L_type.Caption;    
+
+end;
+
+
+
+procedure TFrm_joziat_pardakht_Be_foroshande.FormShow(Sender: TObject);
+begin
+ //DataMo_shakhs.show_kharidar;
+  DataM_forosh.show_sal;
+end;
+
+procedure TFrm_joziat_pardakht_Be_foroshande.scsalClick(Sender: TObject);
+begin
+  show_joz_sal;
+end;
+
+procedure TFrm_joziat_pardakht_Be_foroshande.Button1Click(Sender: TObject);
+begin
+  show_joz_tarikh;
+end;
+
+procedure TFrm_joziat_pardakht_Be_foroshande.btaeedallClick(
+  Sender: TObject);
+begin
+  show_joz_bein_tarikh;
+end;
+
+procedure TFrm_joziat_pardakht_Be_foroshande.E_searchChange(
+  Sender: TObject);
+begin
+  DataMo_shakhs.ADOQ_kharidar.Locate('family',E_search.Text,[loPartialKey]);
+end;
+
+procedure TFrm_joziat_pardakht_Be_foroshande.Edit1Change(Sender: TObject);
+var s:string;
+begin
+  if Edit1.Text='' then
+    s:='0'
+  else
+    s:=Edit1.Text;
+   DataMo_shakhs.ADOQ_kharidar.Locate('cod',s,[loPartialKey]);
+end;
+
+procedure TFrm_joziat_pardakht_Be_foroshande.Edit1KeyPress(Sender: TObject;
+  var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure TFrm_joziat_pardakht_Be_foroshande.dxToolButton1Click(
+  Sender: TObject);
+begin
+  if not CheckBox1.Checked then
+    Frm_print_joziat_par_be_foro.QuickRep1.Preview
+  else
+  begin
+     show_joz_sh_kh;
+     Frm_print_joziat_par_be_foro_sh_kh.QuickRep1.Preview;
+  end;
+end;
+
+end.

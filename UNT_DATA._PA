@@ -1,0 +1,50 @@
+unit unt_Datam_joziat_ranande;
+
+interface
+
+uses
+  SysUtils, Classes, DB, ADODB;
+
+type
+  TDatam_joziat_ranande = class(TDataModule)
+    ADOQ_joziat_daron: TADOQuery;
+    ADOQ_joziat_boron: TADOQuery;
+    ADOQ_jam_joz_dron: TADOQuery;
+    ADOQ_jam_joz_boron: TADOQuery;
+    ADOQ_jam_joz_boronvazn_kol: TFloatField;
+    ADOQ_jam_joz_boronkol_keraye: TFloatField;
+    ADOQ_jam_joz_borongoni_kol: TFloatField;
+    ADOQ_jam_joz_dronvazn_kol: TFloatField;
+    ADOQ_jam_joz_dronkol_keraye: TFloatField;
+    ADOQ_jam_joz_drongoni_kol: TFloatField;
+    ADOQ_joziat_borontarikh: TWideStringField;
+    ADOQ_joziat_boronvazn: TFloatField;
+    ADOQ_joziat_boronkeraye_kol: TFloatField;
+    ADOQ_joziat_boronkeraye: TIntegerField;
+    ADOQ_joziat_borongoni: TIntegerField;
+    ADOQ_joziat_boronname: TWideStringField;
+    ADOQ_joziat_boronfamily: TWideStringField;
+    ADOQ_joziat_darontarikh: TWideStringField;
+    ADOQ_joziat_daronvazn_kol: TFloatField;
+    ADOQ_joziat_daronsh_kh: TFloatField;
+    ADOQ_joziat_daronker_kol: TFloatField;
+    ADOQ_joziat_daronkeraye_az_kh: TFloatField;
+    ADOQ_joziat_darongoni_kol: TFloatField;
+    ADOQ_joziat_daronfamily_kh: TWideStringField;
+    ADOQ_joziat_daronname_kh: TWideStringField;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Datam_joziat_ranande: TDatam_joziat_ranande;
+
+implementation
+
+uses unt_DataMo_shakhs;
+
+{$R *.dfm}
+
+end.

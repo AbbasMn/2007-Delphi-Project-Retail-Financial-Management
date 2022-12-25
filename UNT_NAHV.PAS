@@ -1,0 +1,631 @@
+unit unt_nahve_pardakht_kharidar;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Grids, DBGrids, DBCtrls, StdCtrls, ExtCtrls, SUIForm, DB;
+
+type
+  Tfrm_nahve_pardakht_kharidar = class(TForm)
+    suiForm1: TsuiForm;
+    Button1: TButton;
+    Button2: TButton;
+    GroupBox2: TGroupBox;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label1: TLabel;
+    Label3: TLabel;
+    E_shobe: TEdit;
+    E_mablagh_check: TEdit;
+    E_sh_check: TEdit;
+    E_jari: TEdit;
+    l_type: TLabel;
+    GroupBox5: TGroupBox;
+    RadioGroup11: TRadioGroup;
+    E_tarikh: TEdit;
+    GroupBox1: TGroupBox;
+    Label2: TLabel;
+    E_mablagh_nagd: TEdit;
+    GroupBox3: TGroupBox;
+    L_bedeh: TLabel;
+    Button3: TButton;
+    Button5: TButton;
+    DBGrid4: TDBGrid;
+    DataSource1: TDataSource;
+    ComboBox1: TComboBox;
+    L_cod_kharidar: TLabel;
+    L_sh_kharid: TLabel;
+    L_tarikh: TLabel;
+    L_nakhales_sh_kh: TLabel;
+    L_type_kh: TLabel;
+    L_nakhales_kol_kh: TLabel;
+    GroupBox4: TGroupBox;
+    Label4: TLabel;
+    Label8: TLabel;
+    L_bedeh_temp: TLabel;
+    L_talab_temp: TLabel;
+    L_nakhales_temp: TLabel;
+    Button4: TButton;
+    DataSource2: TDataSource;
+    L_nakhales_kol: TLabel;
+    procedure E_mablagh_nagdKeyPress(Sender: TObject; var Key: Char);
+    procedure E_sh_checkKeyPress(Sender: TObject; var Key: Char);
+    procedure E_mablagh_checkKeyPress(Sender: TObject; var Key: Char);
+    procedure RadioGroup11Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure clear_check;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    function check_check:boolean;
+    procedure add_check;
+    procedure show_temp_check;
+    procedure delete_temp_check;
+    function exist_pardakht_for_sh_kharid:boolean;
+    procedure add_pardakht_for_sh_kharid_to_jadavel;
+    procedure az_temp_check_be_t_checkha_sh_kharid;
+    procedure add_naghdi_to_t_naghde_sh_kharid(id,sh_kh:string);
+    procedure add_jame_mablagh_check_va_mablagh_nagd_for_sh_kh(id,sh_kh:string);
+    procedure Button5Click(Sender: TObject);
+    procedure print_sh_kharid(tarikh,sh_kh,cod_kharidar:string);
+    procedure print_kol_kharid(tarikh,cod_kharidar:string);
+    procedure Button4Click(Sender: TObject);
+    function exist_pardakht_for_kol_kharid:boolean;
+    procedure add_pardakht_for_kol_kharid_to_jadavel;
+    procedure az_temp_check_be_t_checkha_kol_kharid;
+    procedure add_jame_mablagh_check_va_mablagh_nagd_for_kol_kh(id:string);
+    procedure add_naghdi_to_t_naghde_kol_kharid(id:string);
+    function exist_pardakht_for_sh_kharid_and_not_exist_pardakht_for_kol_kharid:boolean;
+    function exist_sh_kh_for_tarikh:boolean;
+    procedure mohasebe_bede_talabe_varede_shode;
+    procedure E_mablagh_nagdExit(Sender: TObject);
+    procedure E_mablagh_nagdChange(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frm_nahve_pardakht_kharidar: Tfrm_nahve_pardakht_kharidar;
+
+implementation
+
+uses Taghvim, unt_main, unt_DataM_final, unt_print_nahve_pardakht,
+  unt_add_kharidha, unt_eslah_forosh, unt_DataMo_shakhs, unt_DataM_forosh;
+
+{$R *.dfm}
+procedure Tfrm_nahve_pardakht_kharidar.mohasebe_bede_talabe_varede_shode;
+var s,m_check:string;
+begin
+  //if DBText1.Caption='' then
+  if DataM_forosh.ADOQ_forosh.recordcount<=0 then
+    close;
+  if E_mablagh_nagd.Text='' then
+    E_mablagh_nagd.Text:='0';
+  DataM_final.ADOQ_sum_mab_ch_on_temp.SQL.Text:='select  sum(mablagh_ch)as jam_check from T_temp_check';
+  DataM_final.ADOQ_sum_mab_ch_on_temp.Open;
+  sleep(100);
+  if (DataM_final.ADOQ_sum_mab_ch_on_tempjam_check.AsString='') or(DataM_final.ADOQ_sum_mab_ch_on_tempjam_check.AsString='0')then
+    m_check:='0'
+  else
+    m_check:=DataM_final.ADOQ_sum_mab_ch_on_tempjam_check.AsString;
+  s:=FloatToStr(StrToFloat(L_nakhales_kol.Caption)-StrToFloat(E_mablagh_nagd.Text)-StrToFloat(m_check));
+
+  if StrToFloat(s)>0 then
+  begin
+    L_bedeh_temp.Caption:=s;
+    L_talab_temp.Caption:='0';
+  end;
+  if StrToFloat(s)<0 then
+  begin
+    L_bedeh_temp.Caption:='0';
+    L_talab_temp.Caption:=FloatToStr(StrToFloat(s)* -1);
+  end;
+  if StrToFloat(s)=0 then
+  begin
+    L_bedeh_temp.Caption:='0';
+    L_talab_temp.Caption:='0';
+  end;
+
+end;
+
+function Tfrm_nahve_pardakht_kharidar.exist_sh_kh_for_tarikh:boolean;
+begin
+  exist_sh_kh_for_tarikh:=false;
+ DataM_final.ADOQ_index_sh_kh.SQL.Text:='select * from T_index_sh_kharid where tarikh='+QuotedStr(L_tarikh.Caption)+
+ ' and cod_sh='+QuotedStr(L_cod_kharidar.Caption);
+ DataM_final.ADOQ_index_sh_kh.Open;
+
+
+ if (DataM_final.ADOQ_index_sh_kh.RecordCount> 0) then
+    exist_sh_kh_for_tarikh:=true;
+end;
+
+
+
+function Tfrm_nahve_pardakht_kharidar.exist_pardakht_for_sh_kharid_and_not_exist_pardakht_for_kol_kharid:boolean;
+begin
+  exist_pardakht_for_sh_kharid_and_not_exist_pardakht_for_kol_kharid:=false;
+ DataM_final.ADOQ_index_sh_kh.SQL.Text:='select * from T_index_sh_kharid where tarikh='+QuotedStr(L_tarikh.Caption)+
+ ' and cod_sh='+QuotedStr(L_cod_kharidar.Caption);
+ DataM_final.ADOQ_index_sh_kh.Open;
+
+  DataM_final.ADOQ_index_kol_kh.SQL.Text:='select * from T_index_kol_kharid where tarikh='+QuotedStr(frm_eslah_forosh.E_tarikh.Text)+
+ ' and cod_sh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarcod.AsString);
+ DataM_final.ADOQ_index_kol_kh.Open;
+
+ if (DataM_final.ADOQ_index_kol_kh.RecordCount<=0)and(DataM_final.ADOQ_index_sh_kh.RecordCount>0) then
+
+    exist_pardakht_for_sh_kharid_and_not_exist_pardakht_for_kol_kharid:=true;
+end;
+
+
+
+procedure  Tfrm_nahve_pardakht_kharidar.add_jame_mablagh_check_va_mablagh_nagd_for_kol_kh(id:string);
+var jam_check,naghd,bedeh,talab,tafavot:string;
+begin
+  talab:='0';
+  bedeh:='0';
+  DataM_final.ADOQ_jam_check_kol_kh.SQL.Text:='select sum(mablagh_ch) as jam_mablagh_ch from t_checkha_kol_kharid where '+
+  'id='+QuotedStr(id);
+
+  DataM_final.ADOQ_jam_check_kol_kh.Open;
+
+
+
+  DataM_final.ADOQ_t_naghde_kol_kharid.SQL.Text:='select * from t_naghde_kol_kharid  where '+
+  'id='+QuotedStr(id);
+
+  DataM_final.ADOQ_t_naghde_kol_kharid.Open;
+
+  naghd:=DataM_final.ADOQ_t_naghde_kol_kharidmablagh_nagd.AsString;
+  jam_check:=DataM_final.ADOQ_jam_check_kol_khjam_mablagh_ch.AsString;
+
+  if jam_check='' then
+    jam_check:='0';
+
+  tafavot:=FloatToStr(StrToFloat((trim(L_nakhales_kol_kh.Caption)))-StrToFloat(naghd)-StrToFloat(jam_check));
+
+  if StrToFloat(tafavot)>0 then
+    bedeh:=tafavot
+   else
+   talab:=FloatToStr(StrToFloat(tafavot)* -1);
+
+  DataM_final.ADOQ_T_bedeh_talab_kol_kharid.SQL.Text:='insert into T_bedeh_talab_kol_kharid(id,bedeh,talab,tarikh,cod_sh)values('+
+  QuotedStr(id)+','+bedeh+','+talab+','+QuotedStr(L_tarikh.Caption)+','+QuotedStr(L_cod_kharidar.Caption)+')';
+  DataM_final.ADOQ_T_bedeh_talab_kol_kharid.ExecSQL;
+
+end;
+
+
+procedure Tfrm_nahve_pardakht_kharidar.add_naghdi_to_t_naghde_kol_kharid(id:string);
+begin
+  DataM_final.ADOQ_t_naghde_kol_kharid.SQL.Text:='insert into t_naghde_kol_kharid(id,mablagh_nagd)values('+
+  QuotedStr(id)+','+E_mablagh_nagd.Text+')';
+
+  DataM_final.ADOQ_t_naghde_kol_kharid.ExecSQL;
+end;
+
+
+
+
+
+procedure Tfrm_nahve_pardakht_kharidar.az_temp_check_be_t_checkha_kol_kharid;
+var id_index_kh:string;
+begin
+
+  DataM_final.ADOQ_index_kol_kh.SQL.Text:='select * from T_index_kol_kharid where tarikh='+QuotedStr(L_tarikh.Caption)+
+  ' and  cod_sh='+QuotedStr(L_cod_kharidar.Caption);
+  DataM_final.ADOQ_index_kol_kh.Open;
+
+  id_index_kh:=DataM_final.ADOQ_index_kol_khid.AsString;
+  show_temp_check;
+ DataM_final.ADOQ_temp_check.First;
+ while not (DataM_final.ADOQ_temp_check.Eof) do
+ begin
+    DataM_final.ADOQ_t_checkha_kol_kharid.SQL.Text:='insert into t_checkha_kol_kharid(bank_name,shobe,jari,sh_check,tarikh_ch,mablagh_ch,id)values('+
+    QuotedStr(DataM_final.ADOQ_temp_checkbank_name.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checkshobe.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checkjari.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checksh_check.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checktarikh_ch.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checkmablagh_ch.AsString)+','+    
+    QuotedStr(id_index_kh)+')';
+    DataM_final.ADOQ_t_checkha_kol_kharid.ExecSQL;
+  DataM_final.ADOQ_temp_check.Delete;
+  DataM_final.ADOQ_temp_check.First;
+ end;
+  add_naghdi_to_t_naghde_kol_kharid(id_index_kh);
+  add_jame_mablagh_check_va_mablagh_nagd_for_kol_kh(id_index_kh);
+
+end;
+
+
+
+
+procedure Tfrm_nahve_pardakht_kharidar.add_pardakht_for_kol_kharid_to_jadavel;
+var s:string;
+begin
+  DataM_final.ADOQ_index_kol_kh.SQL.Text:='insert into T_index_kol_kharid(tarikh,cod_sh)values('+
+  QuotedStr(L_tarikh.Caption)+','+QuotedStr(L_cod_kharidar.Caption)+')';
+  DataM_final.ADOQ_index_kol_kh.ExecSQL;
+
+  az_temp_check_be_t_checkha_kol_kharid;
+end;
+
+function Tfrm_nahve_pardakht_kharidar.exist_pardakht_for_kol_kharid:boolean;
+begin
+  exist_pardakht_for_kol_kharid:=false;
+ DataM_final.ADOQ_index_kol_kh.SQL.Text:='select * from T_index_kol_kharid where tarikh='+QuotedStr(frm_eslah_forosh.E_tarikh.Text)+
+ ' and cod_sh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarcod.AsString);
+ DataM_final.ADOQ_index_kol_kh.Open;
+
+ if DataM_final.ADOQ_index_kol_kh.RecordCount>0 then
+    exist_pardakht_for_kol_kharid:=true;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.print_sh_kharid(tarikh,sh_kh,cod_kharidar:string);
+var id_index,sh_kh_index:string;
+begin
+  DataM_final.ADOQ_index_sh_kh.SQL.Text:='select * from T_index_sh_kharid where tarikh='+QuotedStr(tarikh)+
+ ' and cod_sh='+QuotedStr(cod_kharidar)+' and sh_kh='+QuotedStr(sh_kh);
+ DataM_final.ADOQ_index_sh_kh.Open;
+
+ if DataM_final.ADOQ_index_sh_kh.RecordCount>0 then
+ begin
+  id_index:=DataM_final.ADOQ_index_sh_khid.AsString;
+  sh_kh_index:=DataM_final.ADOQ_index_sh_khsh_kh.AsString;
+
+
+  DataM_final.ADOQ_t_checkha_sh_kharid.SQL.Text:='select * from t_checkha_sh_kharid where id='+
+  QuotedStr(id_index)+' and sh_kh='+QuotedStr(sh_kh_index);
+  DataM_final.ADOQ_t_checkha_sh_kharid.Open;
+
+  DataM_final.ADOQ_T_bedeh_talab_sh_kharid.SQL.Text:='select * from T_bedeh_talab_sh_kharid where id='+
+  QuotedStr(id_index)+' and sh_kh='+QuotedStr(sh_kh_index);
+  DataM_final.ADOQ_T_bedeh_talab_sh_kharid.Open;
+
+  DataM_final.ADOQ_t_naghde_sh_kharid.SQL.Text:='select * from t_naghde_sh_kharid where id='+
+  QuotedStr(id_index)+' and sh_kh='+QuotedStr(sh_kh_index);
+  DataM_final.ADOQ_t_naghde_sh_kharid.Open;
+  sleep(2000);
+ end
+ else
+   MessageBox(Handle,'ÈÑÇÔ ÔãÇÑå ÎÑíÏ ÇäÊÎÇÈí ÏÑ ÊÇÑíÎ ãæÑÏ äÙÑ ¡ ÑÏÇÎÊí ËÈÊ äÔÏå ÇÓÊ.','ÎØÇ !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+
+
+
+
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.print_kol_kharid(tarikh,cod_kharidar:string);
+var id_index:string;
+begin
+  DataM_final.ADOQ_jam_bedeh_kharidar.SQL.Text:='select sum(geymat_kol+ojrat_az_kh_kol+keraye_az_kh_kol) as jam_nakhales_kol '+
+  ' from t_forosh where name_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarname.AsString)+
+  ' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidarfamily.AsString)+
+  ' and tarikh='+QuotedStr(E_tarikh.Text);
+
+   DataM_final.ADOQ_jam_bedeh_kharidar.Open;
+   sleep(2000);
+   
+  DataM_final.ADOQ_index_kol_kh.SQL.Text:='select * from T_index_kol_kharid where tarikh='+QuotedStr(tarikh)+
+ ' and cod_sh='+QuotedStr(cod_kharidar);
+ DataM_final.ADOQ_index_kol_kh.Open;
+
+ if DataM_final.ADOQ_index_kol_kh.RecordCount>0 then
+ begin
+  id_index:=DataM_final.ADOQ_index_kol_khid.AsString;
+
+  DataM_final.ADOQ_t_checkha_kol_kharid.SQL.Text:='select * from t_checkha_kol_kharid where id='+
+  QuotedStr(id_index);
+  DataM_final.ADOQ_t_checkha_kol_kharid.Open;
+
+  DataM_final.ADOQ_T_bedeh_talab_kol_kharid.SQL.Text:='select * from T_bedeh_talab_kol_kharid where id='+
+  QuotedStr(id_index);
+  DataM_final.ADOQ_T_bedeh_talab_kol_kharid.Open;
+
+  DataM_final.ADOQ_t_naghde_kol_kharid.SQL.Text:='select * from t_naghde_kol_kharid where id='+
+  QuotedStr(id_index);
+  DataM_final.ADOQ_t_naghde_kol_kharid.Open;
+
+  DataM_final.ADOQ_t_checkha_kol_kharid.SQL.Text:='select * from t_checkha_kol_kharid where id='+
+  QuotedStr(id_index);
+  DataM_final.ADOQ_t_checkha_kol_kharid.Open;
+  sleep(1000);
+ end
+ else
+   MessageBox(Handle,'ÏÑ ÊÇÑíÎ ÇäÊÎÇÈ ÔÏå ¡ ÑÏÇÎÊí ËÈÊ äÔÏå ÇÓÊ.','ÎØÇ !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+
+end;
+
+procedure  Tfrm_nahve_pardakht_kharidar.add_jame_mablagh_check_va_mablagh_nagd_for_sh_kh(id,sh_kh:string);
+var jam_check,naghd,bedeh,talab,tafavot:string;
+begin
+  talab:='0';
+  bedeh:='0';
+  DataM_final.ADOQ_jam_check_sh_kh.SQL.Text:='select sum(mablagh_ch) as jam_mablagh_ch from t_checkha_sh_kharid where '+
+  'id='+QuotedStr(id)+' and sh_kh='+QuotedStr(sh_kh);
+
+  DataM_final.ADOQ_jam_check_sh_kh.Open;
+
+
+
+  DataM_final.ADOQ_t_naghde_sh_kharid.SQL.Text:='select * from t_naghde_sh_kharid  where '+
+  'id='+QuotedStr(id)+' and sh_kh='+QuotedStr(sh_kh);
+
+  DataM_final.ADOQ_t_naghde_sh_kharid.Open;
+
+  naghd:=DataM_final.ADOQ_t_naghde_sh_kharidmablagh_nagd.AsString;
+  jam_check:=DataM_final.ADOQ_jam_check_sh_khjam_mablagh_ch.AsString;
+
+  if jam_check='' then
+    jam_check:='0';
+
+  tafavot:=FloatToStr(StrToFloat((trim(L_nakhales_sh_kh.Caption)))-StrToFloat(naghd)-StrToFloat(jam_check));
+
+  if StrToFloat(tafavot)>0 then
+    bedeh:=tafavot
+   else
+   talab:=FloatToStr(StrToFloat(tafavot)* -1);
+
+  DataM_final.ADOQ_T_bedeh_talab_sh_kharid.SQL.Text:='insert into T_bedeh_talab_sh_kharid(id,sh_kh,bedeh,talab,tarikh,cod_sh)values('+
+  QuotedStr(id)+','+QuotedStr(sh_kh)+','+bedeh+','+talab+','+QuotedStr(L_tarikh.Caption)+','+QuotedStr(L_cod_kharidar.Caption)+')';
+  DataM_final.ADOQ_T_bedeh_talab_sh_kharid.ExecSQL;
+
+end;
+
+
+procedure Tfrm_nahve_pardakht_kharidar.add_naghdi_to_t_naghde_sh_kharid(id,sh_kh:string);
+begin
+  DataM_final.ADOQ_t_naghde_sh_kharid.SQL.Text:='insert into t_naghde_sh_kharid(id,sh_kh,mablagh_nagd)values('+
+  QuotedStr(id)+','+QuotedStr(sh_kh)+','+E_mablagh_nagd.Text+')';
+
+  DataM_final.ADOQ_t_naghde_sh_kharid.ExecSQL;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.az_temp_check_be_t_checkha_sh_kharid;
+var id_index_kh,sh_kh_index_kh:string;
+begin
+
+  DataM_final.ADOQ_index_sh_kh.SQL.Text:='select * from T_index_sh_kharid where tarikh='+QuotedStr(L_tarikh.Caption)+
+  ' and  cod_sh='+QuotedStr(L_cod_kharidar.Caption)+' and sh_kh='+QuotedStr(L_sh_kharid.Caption);
+  DataM_final.ADOQ_index_sh_kh.Open;
+
+  id_index_kh:=DataM_final.ADOQ_index_sh_khid.AsString;
+  sh_kh_index_kh:=DataM_final.ADOQ_index_sh_khsh_kh.AsString;
+  show_temp_check;
+ DataM_final.ADOQ_temp_check.First;
+ while not (DataM_final.ADOQ_temp_check.Eof) do
+ begin
+    DataM_final.ADOQ_t_checkha_sh_kharid.SQL.Text:='insert into t_checkha_sh_kharid(bank_name,shobe,jari,sh_check,tarikh_ch,mablagh_ch,id,sh_kh)values('+
+    QuotedStr(DataM_final.ADOQ_temp_checkbank_name.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checkshobe.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checkjari.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checksh_check.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checktarikh_ch.AsString)+','+
+    QuotedStr(DataM_final.ADOQ_temp_checkmablagh_ch.AsString)+','+
+    QuotedStr(id_index_kh)+','+QuotedStr(sh_kh_index_kh)+')';
+
+    DataM_final.ADOQ_t_checkha_sh_kharid.ExecSQL;
+    DataM_final.ADOQ_temp_check.Delete;
+    DataM_final.ADOQ_temp_check.First;
+ end;
+  add_naghdi_to_t_naghde_sh_kharid(id_index_kh,sh_kh_index_kh);
+  add_jame_mablagh_check_va_mablagh_nagd_for_sh_kh(id_index_kh,sh_kh_index_kh);
+
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.add_pardakht_for_sh_kharid_to_jadavel;
+var s:string;
+begin
+  DataM_final.ADOQ_index_sh_kh.SQL.Text:='insert into T_index_sh_kharid(tarikh,cod_sh,sh_kh)values('+
+  QuotedStr(L_tarikh.Caption)+','+QuotedStr(L_cod_kharidar.Caption)+','+QuotedStr(L_sh_kharid.Caption)+')';
+  DataM_final.ADOQ_index_sh_kh.ExecSQL;
+
+  az_temp_check_be_t_checkha_sh_kharid;
+end;
+
+
+
+function Tfrm_nahve_pardakht_kharidar.exist_pardakht_for_sh_kharid:boolean;
+begin
+  exist_pardakht_for_sh_kharid:=false;
+ DataM_final.ADOQ_index_sh_kh.SQL.Text:='select * from T_index_sh_kharid where tarikh='+QuotedStr(L_tarikh.Caption)+
+ ' and cod_sh='+QuotedStr(L_cod_kharidar.Caption)+' and sh_kh='+QuotedStr(L_sh_kharid.Caption);
+ DataM_final.ADOQ_index_sh_kh.Open;
+
+ if DataM_final.ADOQ_index_sh_kh.RecordCount>0 then
+    exist_pardakht_for_sh_kharid:=true;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.delete_temp_check;
+begin
+ show_temp_check;
+ DataM_final.ADOQ_temp_check.First;
+ while not (DataM_final.ADOQ_temp_check.Eof) do
+ begin
+  DataM_final.ADOQ_temp_check.Delete;
+  DataM_final.ADOQ_temp_check.First;
+ end;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.show_temp_check;
+begin
+  DataM_final.ADOQ_temp_check.SQL.Text:='select * from T_temp_check';
+  DataM_final.ADOQ_temp_check.Open;
+end;
+procedure Tfrm_nahve_pardakht_kharidar.add_check;
+begin
+  DataM_final.ADOQ_temp_check.SQL.Text:='insert into T_temp_check(bank_name,shobe,jari,sh_check,tarikh_ch,mablagh_ch)'+
+  ' values('+QuotedStr(ComboBox1.Text)+','+QuotedStr(E_shobe.Text)+','+QuotedStr(E_jari.Text)+','+QuotedStr(E_sh_check.Text)+
+  ','+QuotedStr(E_tarikh.Text)+','+E_mablagh_check.Text+')';
+
+  DataM_final.ADOQ_temp_check.ExecSQL;
+end;
+
+function Tfrm_nahve_pardakht_kharidar.check_check:boolean;
+begin
+   check_check:=true;
+   if(E_shobe.Text='')or(ComboBox1.Text='')or(E_jari.Text='')or(E_tarikh.Text='')or(E_sh_check.Text='')or(E_mablagh_check.Text='') then
+   begin
+    check_check:=False;
+    MessageBox(Handle,'ÝíáÏåÇí ÓÊÇÑå ÏÇÑ ÌåÊ ËÈÊ ˜ ÈÇíÏ æÇÑÏ ÔæäÏ.','ÎØÇ !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+   end;
+
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.clear_check;
+begin
+  E_shobe.Text:='';
+  E_mablagh_check.Text:='';
+  E_jari.Text:='';
+  E_mablagh_check.Text:='';
+  E_sh_check.Text:='';
+end;
+
+
+procedure Tfrm_nahve_pardakht_kharidar.E_mablagh_nagdKeyPress(
+  Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.E_sh_checkKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.E_mablagh_checkKeyPress(
+  Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.RadioGroup11Click(Sender: TObject);
+begin
+   if RadioGroup11.ItemIndex=1 then
+  Begin
+    _taghvim.ShowModal;
+    E_tarikh.Text:=_taghvim._str_date;
+    if E_tarikh.Text='' then
+      E_tarikh.Text:=frm_main.E_tarikh.Text;
+  end
+  else
+    E_tarikh.Text:=frm_main.E_tarikh.Text;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.FormShow(Sender: TObject);
+begin
+  E_tarikh.Text:=frm_main.E_tarikh.Text;
+  L_bedeh_temp.Caption:='';
+  L_talab_temp.Caption:='';
+  E_mablagh_nagd.Text:='';
+  E_mablagh_check.Text:='';
+  show_temp_check;
+  if   DataM_final.ADOQ_temp_check.RecordCount>0 then
+  begin
+   DataM_final.ADOQ_temp_check.First;
+   while not (DataM_final.ADOQ_temp_check.Eof) do
+    begin
+      DataM_final.ADOQ_temp_check.Delete;
+      DataM_final.ADOQ_temp_check.First;
+    end;
+  end;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.Button1Click(Sender: TObject);
+begin
+  if (E_mablagh_nagd.Text='') then
+    E_mablagh_nagd.Text:='0';
+  show_temp_check;
+  if (DataM_final.ADOQ_temp_check.RecordCount<=0)and(E_mablagh_nagd.Text='0') then
+     MessageBox(Handle,'ÑÏÇÎÊ äÞÏí æ ˜ ¡ åí˜ÏÇã æÇÑÏ äÔÏå ÇÓÊ.','ÎØÇ !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING)
+  else
+  begin
+    if (l_type_kh.Caption='sh_kh')then
+    begin
+     if not (frm_nahve_pardakht_kharidar.exist_pardakht_for_sh_kharid) then
+      begin
+       if MessageBox(Handle,'ÑÏÇÎÊåÇí æÇÑÏ ÔÏå ËÈÊ ÔæäÏ¿','ÊæÌå  !',MB_YESNO or MB_ICONQUESTION or MB_RIGHT or MB_RTLREADING)=id_yes then
+       begin
+           add_pardakht_for_sh_kharid_to_jadavel;
+           MessageBox(Handle,'ÑÏÇÎÊåÇí æÇÑÏ ÔÏå ÈÑÇí ÔãÇÑå ÎÑíÏ ÇäÊÎÇÈí ËÈÊ ÑÏíÏ.','ÊæÌå !',MB_OK or MB_ICONINFORMATION or MB_RIGHT or MB_RTLREADING);
+           close;
+       end;
+       end
+       else
+         MessageBox(Handle,'ÑÏÇÎÊ ÈÑÇí ÔãÇÑå ÎÑíÏ ÇäÊÎÇÈí ÞÈáÂ ËÈÊ ÑÏíÏå ÇÓÊ .','ÎØÇ !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+     end;
+
+
+    if (l_type_kh.Caption='kol_kh')then
+    begin
+
+     if not (frm_nahve_pardakht_kharidar.exist_pardakht_for_kol_kharid)  then
+      begin
+       if MessageBox(Handle,'ÑÏÇÎÊåÇí æÇÑÏ ÔÏå ËÈÊ ÔæäÏ¿','ÊæÌå  !',MB_YESNO or MB_ICONQUESTION or MB_RIGHT or MB_RTLREADING)=id_yes then
+       begin
+           add_pardakht_for_kol_kharid_to_jadavel;
+           MessageBox(Handle,'ÑÏÇÎÊåÇí æÇÑÏ ÔÏå ÈÑÇí ˜á ÎÑíÏåÇ ËÈÊ ÑÏíÏ.','ÊæÌå !',MB_OK or MB_ICONINFORMATION or MB_RIGHT or MB_RTLREADING);
+           close;
+       end;
+      end
+       else
+         MessageBox(Handle,' ÑÏÇÎÊ ÈÑÇí ˜á ÎÑíÏåÇ ÏÑ ÊÇÑíÎ ÇäÊÎÇÈí ÞÈáÂ ËÈÊ ÑÏíÏå ÇÓÊ.','ÎØÇ !',MB_OK or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING);
+    end;
+     E_mablagh_nagd.Text:='';
+
+  end;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.Button2Click(Sender: TObject);
+begin
+  close;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.Button3Click(Sender: TObject);
+begin
+ if check_check then
+ begin
+  add_check;
+  show_temp_check;
+  mohasebe_bede_talabe_varede_shode;
+  clear_check;
+ end;
+
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.Button5Click(Sender: TObject);
+begin
+frm_add_kharidha.show_calculator;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.Button4Click(Sender: TObject);
+begin
+ if DataM_final.ADOQ_temp_check.RecordCount>0 then
+ begin
+  DataM_final.ADOQ_temp_check.Delete;
+  mohasebe_bede_talabe_varede_shode;
+ end;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.E_mablagh_nagdExit(Sender: TObject);
+begin
+  mohasebe_bede_talabe_varede_shode;
+end;
+
+procedure Tfrm_nahve_pardakht_kharidar.E_mablagh_nagdChange(
+  Sender: TObject);
+begin
+  mohasebe_bede_talabe_varede_shode;
+end;
+
+end.

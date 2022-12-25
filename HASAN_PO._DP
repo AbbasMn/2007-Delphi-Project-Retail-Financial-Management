@@ -1,0 +1,166 @@
+program hasan_por;
+
+uses
+  Forms,
+  unt_main in 'unt_main.pas' {frm_main},
+  unt_sh_jadid in '..\golshan-hesabdar-scource-access db\hesabdar-scource\icon\unt_sh_jadid.pas' {frm_foroshande_jadid},
+  unt_DataMo_shakhs in 'unt_DataMo_shakhs.pas' {DataMo_shakhs: TDataModule},
+  Taghvim in 'Taghvim.pas' {_taghvim},
+  unt__forosh in 'unt__forosh.pas' {Frm_forosh},
+  unt_DataM_forosh in 'unt_DataM_forosh.pas' {DataM_forosh: TDataModule},
+  unt_search_forosh in 'unt_search_forosh.pas' {Frm_search_forosh},
+  ynt_print_search_forosh in 'ynt_print_search_forosh.pas' {frm_print_search_forosh},
+  unt_sel_kharid in 'unt_sel_kharid.pas' {frm_sel_kharid},
+  unt_add_kharidha in 'unt_add_kharidha.pas' {frm_add_kharidha},
+  unt_view_shakhs in 'unt_view_shakhs.pas' {frm_view_shakhs},
+  unt_print_kharidar in 'unt_print_kharidar.pas' {Frm_print_kharidar},
+  unt_print_foroshande in 'unt_print_foroshande.pas' {frm_print_foroshande},
+  unt_DataM_group_by in 'unt_DataM_group_by.pas' {DataM_group_by: TDataModule},
+  unt_koli_kharidar in 'unt_koli_kharidar.pas' {frm_koli_kharidar},
+  unt_print_koli_kharidar in 'unt_print_koli_kharidar.pas' {frm_print_koli_kharidar},
+  unt_koli_foroshande in 'unt_koli_foroshande.pas' {frm_koli_foroshande},
+  unt_print_koli_foroshande in 'unt_print_koli_foroshande.pas' {frm_print_koli_foroshande},
+  unt_add_sal_fi in 'unt_add_sal_fi.pas' {frm_add_sal_fi},
+  unt_login in 'unt_login.pas' {frm_login},
+  unt_chang_public_login in 'unt_chang_public_login.pas' {frm_chang_public_login},
+  unt_hasanpor in 'unt_hasanpor.pas' {Frm_hasanpor},
+  unt_print_hasanpor in 'unt_print_hasanpor.pas' {Frm_print_hasanpor},
+  unt_hasanpor_login in 'unt_hasanpor_login.pas' {Frm_hasanpor_login},
+  UNT_PRINT_BARAYE_KHARIDAR in 'UNT_PRINT_BARAYE_KHARIDAR.pas' {FRM_PRINT_BARAYE_KHARIDAR},
+  unt_print_fo in 'unt_print_fo.pas' {Frm_print_fo},
+  unt_pardakht_be_foroshande in 'unt_pardakht_be_foroshande.pas' {frm_pardakht_be_foroshande},
+  unt_sabt_pardakht in 'unt_sabt_pardakht.pas' {frm_sabt_pardakht},
+  unt_add_ranande in 'unt_add_ranande.pas' {frm_add_ranande},
+  unt_search_for_ranande in 'unt_search_for_ranande.pas' {frm_search_for_ranande},
+  unt_print_haml_bar in 'unt_print_haml_bar.pas' {Frm_print_haml_bar},
+  unt_sabt_pardakht_koli in 'unt_sabt_pardakht_koli.pas' {frm_sabt_pardakht_koli},
+  unt_eslah in 'unt_eslah.pas' {frm_eslah},
+  unt_eslah_forosh in 'unt_eslah_forosh.pas' {frm_eslah_forosh},
+  unt_eslah_asli in 'unt_eslah_asli.pas' {frm_eslah_asli},
+  unt_dabare in 'unt_dabare.pas' {frm_dabare},
+  Unt_add_bank in 'Unt_add_bank.pas' {frm_add_bank},
+  unt_search_bank in 'unt_search_bank.pas' {Frm_search_bank},
+  unt_print_bank in 'unt_print_bank.pas' {frm_print_bank},
+  unt_print_joziat_foroshande in 'unt_print_joziat_foroshande.pas' {Frm_print_joziat_foroshande},
+  unt_frm_eslah_bank in 'unt_frm_eslah_bank.pas' {frm_eslah_bank},
+  unt_print_haml_bar_tarikh in 'unt_print_haml_bar_tarikh.pas' {Frm_print_haml_bar_tarikh},
+  Untserial in 'Untserial.pas' {frmgetserial},
+  unt_search_ranande_daron in 'unt_search_ranande_daron.pas' {frm_search_ranande_daron},
+  unt_print_bar_daron in 'unt_print_bar_daron.pas' {Frm_print_bar_daron},
+  Unt_search_intarikh in 'Unt_search_intarikh.pas' {Frm_search_intarikh},
+  unt_DataM_intarikh in 'unt_DataM_intarikh.pas' {DataM_intarikh: TDataModule},
+  unt_print_hamlbar_joziat in 'unt_print_hamlbar_joziat.pas' {frm_print_hamlbar_joziat},
+  unt_Datam_joziat_ranande in 'unt_Datam_joziat_ranande.pas' {Datam_joziat_ranande: TDataModule},
+  unt_print_bar_daron_joziat in 'unt_print_bar_daron_joziat.pas' {frm_print_bar_daron_joziat},
+  unt_print_bar_daron_jiziat in 'unt_print_bar_daron_jiziat.pas' {Frm_print_bar_daron_jiziat},
+  unt_eslah_haml_bein in 'unt_eslah_haml_bein.pas' {frm_eslah_haml_bein},
+  unt_eslah_haml_daron in 'unt_eslah_haml_daron.pas' {frm_eslah_haml_daron},
+  unt_gozaresh in 'unt_gozaresh.pas' {frm_gozaresh},
+  unt_Datam_gozaresh in 'unt_Datam_gozaresh.pas' {Datam_gozaresh: TDataModule},
+  unt_print_gozaresh in 'unt_print_gozaresh.pas' {frm_print_gozaresh_kharidaran},
+  unt_print_gozaresh_ranande_daron in 'unt_print_gozaresh_ranande_daron.pas' {frm_print_gozaresh_ranande_daron},
+  unt_print_gozaresh_ranande_biron in 'unt_print_gozaresh_ranande_biron.pas' {frm_print_gozaresh_ranande_biron},
+  unt_print_gozaresh_jam in 'unt_print_gozaresh_jam.pas' {frm_print_gozaresh_jam},
+  unt_koli_login in 'unt_koli_login.pas' {frm_koli_login},
+  unt_print_pardakht_be_foroshande_jam in 'unt_print_pardakht_be_foroshande_jam.pas' {frm_print_pardakht_be_foroshande_jam},
+  unt_bank_jadid in 'unt_bank_jadid.pas' {frm_bank_jadid},
+  unt_print_bank2 in 'unt_print_bank2.pas' {Frm_print_bank2},
+  unt_bank_hasanpor in 'unt_bank_hasanpor.pas' {frm_bank_hasanpor},
+  unt_DataM_final in 'unt_DataM_final.pas' {DataM_final: TDataModule},
+  unt_joziat_pardakht_Be_foroshande in 'unt_joziat_pardakht_Be_foroshande.pas' {Frm_joziat_pardakht_Be_foroshande},
+  unt_print_joziat_par_be_foro in 'unt_print_joziat_par_be_foro.pas' {Frm_print_joziat_par_be_foro},
+  unt_nahve_pardakht_kharidar in 'unt_nahve_pardakht_kharidar.pas' {frm_nahve_pardakht_kharidar},
+  unt_print_nahve_pardakht in 'unt_print_nahve_pardakht.pas' {Frm_print_nahve_pardakht},
+  unt_print_nahve_pardakht_kol in 'unt_print_nahve_pardakht_kol.pas' {frm_print_nahve_pardakht_kol},
+  unt_print_joziat_par_be_foro_sh_kh in 'unt_print_joziat_par_be_foro_sh_kh.pas' {Frm_print_joziat_par_be_foro_sh_kh},
+  unt_print_talabkaran in 'unt_print_talabkaran.pas' {frm_print_talabkaran},
+  unt_eslah_nahve_pardakht in 'unt_eslah_nahve_pardakht.pas' {frm_eslah_nahve_pardakht},
+  unt_print_factor_bedeh_talab in 'unt_print_factor_bedeh_talab.pas' {frm_print_factor_bedeh_talab},
+  unt_print_factor_bedeh_talab2 in 'unt_print_factor_bedeh_talab2.pas' {frm_print_factor_bedeh_talab2},
+  unt_print_nahve_pardakht_bedon_check in 'unt_print_nahve_pardakht_bedon_check.pas' {Frm_print_nahve_pardakht_bedon_check},
+  unt_print_nahve_pardakht_kol_bedon_check in 'unt_print_nahve_pardakht_kol_bedon_check.pas' {frm_print_nahve_pardakht_kol_bedon_check};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.Title := 'hasan poor';
+  Application.CreateForm(Tfrm_main, frm_main);
+  Application.CreateForm(Tfrm_gozaresh, frm_gozaresh);
+  Application.CreateForm(Tfrm_dabare, frm_dabare);
+  Application.CreateForm(Tfrm_foroshande_jadid, frm_foroshande_jadid);
+  Application.CreateForm(TDataMo_shakhs, DataMo_shakhs);
+  Application.CreateForm(T_taghvim, _taghvim);
+  Application.CreateForm(TFrm_forosh, Frm_forosh);
+  Application.CreateForm(TDataM_forosh, DataM_forosh);
+  Application.CreateForm(TFrm_search_forosh, Frm_search_forosh);
+  Application.CreateForm(Tfrm_print_search_forosh, frm_print_search_forosh);
+  Application.CreateForm(Tfrm_sel_kharid, frm_sel_kharid);
+  Application.CreateForm(Tfrm_add_kharidha, frm_add_kharidha);
+  Application.CreateForm(Tfrm_view_shakhs, frm_view_shakhs);
+  Application.CreateForm(TFrm_print_kharidar, Frm_print_kharidar);
+  Application.CreateForm(Tfrm_print_foroshande, frm_print_foroshande);
+  Application.CreateForm(TDataM_group_by, DataM_group_by);
+  Application.CreateForm(Tfrm_koli_kharidar, frm_koli_kharidar);
+  Application.CreateForm(Tfrm_print_koli_kharidar, frm_print_koli_kharidar);
+  Application.CreateForm(Tfrm_koli_foroshande, frm_koli_foroshande);
+  Application.CreateForm(Tfrm_print_koli_foroshande, frm_print_koli_foroshande);
+  Application.CreateForm(Tfrm_add_sal_fi, frm_add_sal_fi);
+  Application.CreateForm(Tfrm_login, frm_login);
+  Application.CreateForm(Tfrm_chang_public_login, frm_chang_public_login);
+  Application.CreateForm(TFrm_hasanpor, Frm_hasanpor);
+  Application.CreateForm(TFrm_print_hasanpor, Frm_print_hasanpor);
+  Application.CreateForm(TFrm_hasanpor_login, Frm_hasanpor_login);
+  Application.CreateForm(TFRM_PRINT_BARAYE_KHARIDAR, FRM_PRINT_BARAYE_KHARIDAR);
+  Application.CreateForm(TFrm_print_fo, Frm_print_fo);
+  Application.CreateForm(Tfrm_pardakht_be_foroshande, frm_pardakht_be_foroshande);
+  Application.CreateForm(Tfrm_sabt_pardakht, frm_sabt_pardakht);
+  Application.CreateForm(Tfrm_add_ranande, frm_add_ranande);
+  Application.CreateForm(Tfrm_search_for_ranande, frm_search_for_ranande);
+  Application.CreateForm(TFrm_print_haml_bar, Frm_print_haml_bar);
+  Application.CreateForm(Tfrm_sabt_pardakht_koli, frm_sabt_pardakht_koli);
+  Application.CreateForm(Tfrm_eslah, frm_eslah);
+  Application.CreateForm(Tfrm_eslah_forosh, frm_eslah_forosh);
+  Application.CreateForm(Tfrm_eslah_asli, frm_eslah_asli);
+  Application.CreateForm(Tfrm_add_bank, frm_add_bank);
+  Application.CreateForm(TFrm_search_bank, Frm_search_bank);
+  Application.CreateForm(Tfrm_print_bank, frm_print_bank);
+  Application.CreateForm(TFrm_print_joziat_foroshande, Frm_print_joziat_foroshande);
+  Application.CreateForm(Tfrm_eslah_bank, frm_eslah_bank);
+  Application.CreateForm(TFrm_print_haml_bar_tarikh, Frm_print_haml_bar_tarikh);
+  Application.CreateForm(Tfrmgetserial, frmgetserial);
+  Application.CreateForm(Tfrm_search_ranande_daron, frm_search_ranande_daron);
+  Application.CreateForm(TFrm_print_bar_daron, Frm_print_bar_daron);
+  Application.CreateForm(TFrm_search_intarikh, Frm_search_intarikh);
+  Application.CreateForm(TDataM_intarikh, DataM_intarikh);
+  Application.CreateForm(Tfrm_print_hamlbar_joziat, frm_print_hamlbar_joziat);
+  Application.CreateForm(TDatam_joziat_ranande, Datam_joziat_ranande);
+  Application.CreateForm(Tfrm_print_bar_daron_joziat, frm_print_bar_daron_joziat);
+  Application.CreateForm(TFrm_print_bar_daron_jiziat, Frm_print_bar_daron_jiziat);
+  Application.CreateForm(Tfrm_eslah_haml_bein, frm_eslah_haml_bein);
+  Application.CreateForm(Tfrm_eslah_haml_daron, frm_eslah_haml_daron);
+  Application.CreateForm(TDatam_gozaresh, Datam_gozaresh);
+  Application.CreateForm(Tfrm_print_gozaresh_kharidaran, frm_print_gozaresh_kharidaran);
+  Application.CreateForm(Tfrm_print_gozaresh_ranande_daron, frm_print_gozaresh_ranande_daron);
+  Application.CreateForm(Tfrm_print_gozaresh_ranande_biron, frm_print_gozaresh_ranande_biron);
+  Application.CreateForm(Tfrm_print_gozaresh_jam, frm_print_gozaresh_jam);
+  Application.CreateForm(Tfrm_koli_login, frm_koli_login);
+  Application.CreateForm(Tfrm_print_pardakht_be_foroshande_jam, frm_print_pardakht_be_foroshande_jam);
+  Application.CreateForm(Tfrm_bank_jadid, frm_bank_jadid);
+  Application.CreateForm(TFrm_print_bank2, Frm_print_bank2);
+  Application.CreateForm(Tfrm_bank_hasanpor, frm_bank_hasanpor);
+  Application.CreateForm(TDataM_final, DataM_final);
+  Application.CreateForm(TFrm_joziat_pardakht_Be_foroshande, Frm_joziat_pardakht_Be_foroshande);
+  Application.CreateForm(TFrm_print_joziat_par_be_foro, Frm_print_joziat_par_be_foro);
+  Application.CreateForm(Tfrm_nahve_pardakht_kharidar, frm_nahve_pardakht_kharidar);
+  Application.CreateForm(TFrm_print_nahve_pardakht, Frm_print_nahve_pardakht);
+  Application.CreateForm(Tfrm_print_nahve_pardakht_kol, frm_print_nahve_pardakht_kol);
+  Application.CreateForm(TFrm_print_joziat_par_be_foro_sh_kh, Frm_print_joziat_par_be_foro_sh_kh);
+  Application.CreateForm(Tfrm_print_talabkaran, frm_print_talabkaran);
+  Application.CreateForm(Tfrm_eslah_nahve_pardakht, frm_eslah_nahve_pardakht);
+  Application.CreateForm(Tfrm_print_factor_bedeh_talab, frm_print_factor_bedeh_talab);
+  Application.CreateForm(Tfrm_print_factor_bedeh_talab2, frm_print_factor_bedeh_talab2);
+  Application.CreateForm(TFrm_print_nahve_pardakht_bedon_check, Frm_print_nahve_pardakht_bedon_check);
+  Application.CreateForm(Tfrm_print_nahve_pardakht_kol_bedon_check, frm_print_nahve_pardakht_kol_bedon_check);
+  Application.Run;
+end.

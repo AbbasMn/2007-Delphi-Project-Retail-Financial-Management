@@ -1,0 +1,225 @@
+unit unt_koli_kharidar;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, StdCtrls, dxCore, dxButtons, DBCtrls, Grids, DBGrids,
+  SUIForm, DB, SUIDBCtrls, SUIButton;
+
+type
+  Tfrm_koli_kharidar = class(TForm)
+    DataSource1: TDataSource;
+    DataSource2: TDataSource;
+    DataSource3: TDataSource;
+    suiForm1: TsuiForm;
+    DBGrid1: TDBGrid;
+    G_shakhs: TGroupBox;
+    Label6: TLabel;
+    Label1: TLabel;
+    E_search: TEdit;
+    DBGrid2: TDBGrid;
+    scsal: TDBLookupComboBox;
+    dxToolButton1: TdxToolButton;
+    Label5: TLabel;
+    Edit1: TEdit;
+    Button2: TButton;
+    GroupBox1: TGroupBox;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    E_roz: TEdit;
+    E_mah: TEdit;
+    E_sal: TEdit;
+    Button1: TButton;
+    GroupBox2: TGroupBox;
+    Label7: TLabel;
+    E_roz_ebteda: TEdit;
+    Label9: TLabel;
+    E_mah_ebteda: TEdit;
+    Label11: TLabel;
+    E_sal_ebteda: TEdit;
+    Label8: TLabel;
+    E_roz_enteha: TEdit;
+    Label10: TLabel;
+    E_mah_enteha: TEdit;
+    Label12: TLabel;
+    E_sal_enteha: TEdit;
+    btaeedall: TsuiButton;
+    procedure FormShow(Sender: TObject);
+    procedure E_searchChange(Sender: TObject);
+    procedure kol_(s:string);
+    procedure scsalClick(Sender: TObject);
+    procedure dxToolButton1Click(Sender: TObject);
+    procedure E_rozKeyPress(Sender: TObject; var Key: Char);
+    procedure E_mahKeyPress(Sender: TObject; var Key: Char);
+    procedure E_salKeyPress(Sender: TObject; var Key: Char);
+    procedure Button1Click(Sender: TObject);
+    procedure go_to_jozeiat(s:string);
+    procedure Edit1Change(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+    procedure Button2Click(Sender: TObject);
+    procedure btaeedallClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frm_koli_kharidar: Tfrm_koli_kharidar;
+
+implementation
+
+uses unt_DataM_group_by, unt_DataMo_shakhs, unt_DataM_forosh,
+  unt_print_koli_kharidar, UNT_PRINT_BARAYE_KHARIDAR, unt_eslah_forosh,
+  unt_Datam_gozaresh;
+
+{$R *.dfm}
+procedure Tfrm_koli_kharidar.go_to_jozeiat(s:string);
+var cod,tarikh:string;
+begin
+  cod:=DataMo_shakhs.ADOQ_kharidarcod.AsString;
+  tarikh:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+  if s='sal' then
+  begin
+    DataM_forosh.ADOQ_forosh.SQL.Text:='select * from t_forosh where sal='+QuotedStr(scsal.Text)+'  and cod_kh='+cod+' order by tarikh,sh_kh,cod';
+
+    DataM_forosh.ADOQ_vazn_goni.SQL.Text:='select sum(goni) as  goni_kol,sum(vazn) as vazn_kol from t_forosh'+
+    ' where sal='+QuotedStr(scsal.Text)+'  and cod_kh='+cod;
+
+    DataM_forosh.ADOQ_print_kh.SQL.Text:='select  sum(mount_kh) as kh_mount from t_forosh'+
+    ' where sal='+QuotedStr(scsal.Text)+'  and cod_kh='+cod;
+
+    DataM_forosh.ADOQ_print_kh2.SQL.Text:='select  sum(keraye_az_kh_kol)as keraye_kh,sum(ojrat_az_kh_kol)as ojrat_kh from t_forosh'+
+    ' where sal='+QuotedStr(scsal.Text)+'  and cod_kh='+cod;
+    FRM_PRINT_BARAYE_KHARIDAR.QRL_type.Caption:='Œ—ÌœÂ«Ì œ— ”«·'+scsal.Text;
+  end;
+  if s='tarikh' then
+  begin
+    DataM_forosh.ADOQ_forosh.SQL.Text:='select * from t_forosh where tarikh='+QuotedStr(tarikh)+'  and cod_kh='+cod+' order by sh_kh,cod';
+    
+    DataM_forosh.ADOQ_vazn_goni.SQL.Text:='select sum(goni) as  goni_kol,sum(vazn) as vazn_kol from t_forosh'+
+    ' where tarikh='+QuotedStr(tarikh)+'  and cod_kh='+cod;
+
+    DataM_forosh.ADOQ_print_kh.SQL.Text:='select  sum(mount_kh) as kh_mount from t_forosh'+
+    ' where tarikh='+QuotedStr(tarikh)+'  and cod_kh='+cod;
+
+    DataM_forosh.ADOQ_print_kh2.SQL.Text:='select  sum(keraye_az_kh_kol)as keraye_kh,sum(ojrat_az_kh_kol)as ojrat_kh from t_forosh'+
+     ' where tarikh='+QuotedStr(tarikh)+'  and cod_kh='+cod;
+     FRM_PRINT_BARAYE_KHARIDAR.QRL_type.Caption:='Œ—ÌœÂ«Ì œ—  «—ÌŒ  '+tarikh;
+  end;
+  DataM_forosh.ADOQ_forosh.Open;
+  DataM_forosh.ADOQ_vazn_goni.Open;
+  DataM_forosh.ADOQ_print_kh.Open;
+  DataM_forosh.ADOQ_print_kh2.Open;
+
+  FRM_PRINT_BARAYE_KHARIDAR.QuickRep1.Preview;
+end;
+procedure Tfrm_koli_kharidar.kol_(s:string);
+var tarikh,tarikh1,tarikh2:string;
+begin
+  tarikh:=trim(E_sal.Text)+'/'+trim(E_mah.Text)+'/'+trim(E_roz.Text);
+ if s='sal' then
+ begin
+  DataM_group_by.ADOQ_koli_kharidar.SQL.Text:='select tarikh,sum(vazn)as vazn_kol,sum(goni) as goni_kol,sum(geymat_kol+ojrat_az_kh_kol+keraye_az_kh_kol)as g_kol from t_forosh where name_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString)+' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString)+' and sal='+QuotedStr(scsal.Text)+' group by tarikh order by tarikh';
+  DataM_group_by.ADOQ_sum_koli_kharid.SQL.Text:='select  sum(vazn) as vazn_kol,sum(geymat_kol+ojrat_az_kh_kol+keraye_az_kh_kol) as g_kol,round(g_kol/vazn_kol)as miangin  from t_forosh where name_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString)+' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString)+' and sal='+QuotedStr(scsal.Text);
+  frm_print_koli_kharidar.QRL_type.Caption:='’Ê—  Õ”«» ò·Ì Œ—Ìœ ¬ﬁ« / Œ«‰„  '+DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString+'  '+DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString+'  œ— ”«· '+scsal.Text;
+ end;
+  if s='tarikh' then
+ begin
+   DataM_group_by.ADOQ_koli_kharidar.SQL.Text:='select tarikh,sum(vazn)as vazn_kol,sum(goni) as goni_kol,sum(geymat_kol+ojrat_az_kh_kol+keraye_az_kh_kol)as g_kol from t_forosh where name_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString)+' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString)+' and tarikh='+QuotedStr(tarikh)+' group by tarikh order by tarikh';
+   DataM_group_by.ADOQ_sum_koli_kharid.SQL.Text:='select  sum(vazn) as vazn_kol,sum(geymat_kol+ojrat_az_kh_kol+keraye_az_kh_kol) as g_kol,round(g_kol/vazn_kol)as miangin  from t_forosh where name_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString)+' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString)+' and tarikh='+QuotedStr(tarikh);
+   frm_print_koli_kharidar.QRL_type.Caption:='’Ê—  Õ”«» ò·Ì Œ—Ìœ ¬ﬁ« / Œ«‰„  '+DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString+'  '+DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString+'  œ— «—ÌŒ '+tarikh;
+ end;
+ if s='beintarikh' then
+ begin
+   tarikh1:=trim(E_sal_ebteda.Text)+'/'+trim(E_mah_ebteda.Text)+'/'+trim(E_roz_ebteda.Text);
+   tarikh2:=trim(E_sal_enteha.Text)+'/'+trim(E_mah_enteha.Text)+'/'+trim(E_roz_enteha.Text);
+   DataM_group_by.ADOQ_koli_kharidar.SQL.Text:='select tarikh,sum(vazn)as vazn_kol,sum(goni) as goni_kol,sum(geymat_kol+ojrat_az_kh_kol+keraye_az_kh_kol)as g_kol from t_forosh where name_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString)+' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString)+
+   ' and tarikh between'+QuotedStr(tarikh1)+' and '+QuotedStr(tarikh2)+' group by tarikh order by tarikh';
+   DataM_group_by.ADOQ_sum_koli_kharid.SQL.Text:='select  sum(vazn) as vazn_kol,sum(geymat_kol+ojrat_az_kh_kol+keraye_az_kh_kol) as g_kol,round(g_kol/vazn_kol)as miangin  from t_forosh where name_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString)+' and family_kh='+QuotedStr(DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString)+
+   ' and tarikh between'+  QuotedStr(tarikh1)+' and '+QuotedStr(tarikh2);
+   frm_print_koli_kharidar.QRL_type.Caption:='’Ê—  Õ”«» ò·Ì Œ—Ìœ ¬ﬁ« / Œ«‰„  '+DataMo_shakhs.ADOQ_kharidar.Fields[0].AsString+'  '+DataMo_shakhs.ADOQ_kharidar.Fields[1].AsString+'«“'+tarikh1+' «'+tarikh2;
+ end;
+  DataM_group_by.ADOQ_koli_kharidar.Open;
+  DataM_group_by.ADOQ_sum_koli_kharid.Open;
+
+end;
+procedure Tfrm_koli_kharidar.FormShow(Sender: TObject);
+begin
+  DataM_forosh.show_sal;
+  DataMo_shakhs.show_kharidar;
+  kol_('sal');
+end;
+
+procedure Tfrm_koli_kharidar.E_searchChange(Sender: TObject);
+begin
+  DataMo_shakhs.ADOQ_kharidar.Locate('family',E_search.Text,[loPartialKey]);
+end;
+
+procedure Tfrm_koli_kharidar.scsalClick(Sender: TObject);
+begin
+  kol_('sal');
+end;
+
+procedure Tfrm_koli_kharidar.dxToolButton1Click(Sender: TObject);
+begin
+  frm_print_koli_kharidar.QuickRep1.Preview;
+end;
+
+procedure Tfrm_koli_kharidar.E_rozKeyPress(Sender: TObject; var Key: Char);
+begin
+ if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_koli_kharidar.E_mahKeyPress(Sender: TObject; var Key: Char);
+begin
+ if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_koli_kharidar.E_salKeyPress(Sender: TObject; var Key: Char);
+begin
+ if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_koli_kharidar.Button1Click(Sender: TObject);
+begin
+  if (E_roz.Text='') or (E_sal.Text='')or(E_mah.Text='') then
+    MessageBox(Handle,'—Ê“ ° ”«· Ê  „«Â »«Ìœ Ê«—œ ‘Ê‰œ.',' ÊÃÂ !',mb_ok or MB_ICONEXCLAMATION or MB_RIGHT or MB_RTLREADING)
+  else
+  begin
+    kol_('tarikh');
+  end;
+end;
+
+procedure Tfrm_koli_kharidar.Edit1Change(Sender: TObject);
+var s:string;
+begin
+  if Edit1.Text='' then
+    s:='0'
+  else
+    s:=Edit1.Text;
+   DataMo_shakhs.ADOQ_kharidar.Locate('cod',s,[loPartialKey]);
+end;
+
+procedure Tfrm_koli_kharidar.Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (key in['0'..'9',#8]) then
+   key:=#0;
+end;
+
+procedure Tfrm_koli_kharidar.Button2Click(Sender: TObject);
+begin
+  frm_eslah_forosh.ShowModal;
+end;
+
+procedure Tfrm_koli_kharidar.btaeedallClick(Sender: TObject);
+begin
+ kol_('beintarikh');
+end;
+
+end.
